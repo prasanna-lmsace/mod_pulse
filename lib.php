@@ -597,6 +597,27 @@ function pulse_get_completion_state($course, $cm, $userid, $type, $pulse=null, $
     return $status;
 }
 
+function pulse_process_recorddata($keys, $record) {
+    // Context.
+    $ctxpos = array_search('contextid', $keys);
+    $ctxendpos = array_search('locked', $keys);
+    $context = array_slice($record, $ctxpos, ($ctxendpos - $ctxpos) + 1 );
+    $context['id'] = $context['contextid']; 
+    unset($context['contextid']);
+    // Course module.
+    $cmpos = array_search('cmid', $keys);
+    $cmendpos = array_search('deletioninprogress', $keys);
+    $cm = array_slice($record, $cmpos, ($cmendpos - $cmpos) + 1 );
+    $cm['id'] = $cm['cmid']; 
+    unset($cm['cmid']);
+    // Course records.
+    $coursepos = array_search('courseid', $keys);
+    $course = array_slice($record, $coursepos);
+    $course['id'] = $course['courseid'];
+
+    return [0 => $course, 1 => $context, 2 => $cm];
+}
+
 
 /**
  * Cron task for completion check for students in all pulse module.
@@ -645,20 +666,8 @@ function mod_pulse_completion_crontask() {
         $pulse['id'] = $pulse['nid'];
 
         mtrace("Check the user module completion - Pulse id: ".$pulse['id']);
-        // Context.
-        $ctxpos = array_search('contextid', $keys);
-        $ctxendpos = array_search('locked', $keys);
-        $context = array_slice($record, $ctxpos, ($ctxendpos - $ctxpos) + 1 );
-        $context['id'] = $context['contextid']; unset($context['contextid']);
-        // Course module.
-        $cmpos = array_search('cmid', $keys);
-        $cmendpos = array_search('deletioninprogress', $keys);
-        $cm = array_slice($record, $cmpos, ($cmendpos - $cmpos) + 1 );
-        $cm['id'] = $cm['cmid']; unset($cm['cmid']);
-        // Course records.
-        $coursepos = array_search('courseid', $keys);
-        $course = array_slice($record, $coursepos);
-        $course['id'] = $course['courseid'];
+        // Precess results.
+        list($course, $context, $cm) = pulse_process_recorddata($keys, $record);
         // Get enrolled users with capability.
         $contextlevel = explode('/', $context['path']);
         list($insql, $inparams) = $DB->get_in_or_equal(array_filter($contextlevel));
