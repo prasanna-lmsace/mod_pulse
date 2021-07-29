@@ -18,7 +18,6 @@
  * Scheduled cron task to send pulse.
  *
  * @package   mod_pulse
- * @category  Cron
  * @copyright 2021, bdecent gmbh bdecent.de
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -27,6 +26,9 @@ namespace mod_pulse\task;
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Send notification to users - scheduled task execution observer.
+ */
 class notify_users extends \core\task\scheduled_task {
 
     /**
