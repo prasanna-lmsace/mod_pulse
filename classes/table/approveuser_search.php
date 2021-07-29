@@ -415,5 +415,4 @@ class approveuser_search extends \core_user\table\participants_search {
             'params' => $params,
         ];
     }
-
 }

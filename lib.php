@@ -602,13 +602,13 @@ function pulse_process_recorddata($keys, $record) {
     $ctxpos = array_search('contextid', $keys);
     $ctxendpos = array_search('locked', $keys);
     $context = array_slice($record, $ctxpos, ($ctxendpos - $ctxpos) + 1 );
-    $context['id'] = $context['contextid']; 
+    $context['id'] = $context['contextid'];
     unset($context['contextid']);
     // Course module.
     $cmpos = array_search('cmid', $keys);
     $cmendpos = array_search('deletioninprogress', $keys);
     $cm = array_slice($record, $cmpos, ($cmendpos - $cmpos) + 1 );
-    $cm['id'] = $cm['cmid']; 
+    $cm['id'] = $cm['cmid'];
     unset($cm['cmid']);
     // Course records.
     $coursepos = array_search('courseid', $keys);

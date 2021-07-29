@@ -48,5 +48,4 @@ class notify_users extends \core\task\scheduled_task {
         require_once($CFG->dirroot.'/mod/pulse/lib.php');
         mod_pulse_cron_task();
     }
-
 }
