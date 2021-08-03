@@ -175,7 +175,7 @@ class sendinvitation extends \core\task\adhoc_task {
 
         if (!empty($groups)) {
             $sql = "SELECT gm.*
-            FROM mdl_groups_members  gm
+            FROM {groups_members}  gm
             WHERE gm.groupid IN (".implode(',', $groups).")
             ORDER BY gm.timeadded ASC";
 

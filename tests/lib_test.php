@@ -102,7 +102,7 @@ class mod_pulse_lib_testcase extends advanced_testcase {
         $this->assertTrue($result);
         // Filter students.
         $availableusers = mod_pulse_get_course_students($students, $instance);
-        print_r($availableusers);
+        
         $this->assertEquals(0, count($availableusers));
     }
     /**
