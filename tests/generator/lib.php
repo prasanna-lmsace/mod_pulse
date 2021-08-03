@@ -26,12 +26,12 @@
  * Pulse module instance generator.
  */
 class mod_pulse_generator extends testing_module_generator {
-    
+
     /**
      * Create pulse module instance.
      *
-     * @param  mixed $record
-     * @param  mixed $options
+     * @param  mixed $record Module instance data.
+     * @param  array $options Additional options.
      * @return void
      */
     public function create_instance($record = null, array $options = null) {

@@ -365,6 +365,8 @@ function pulse_pluginfile($course, $cm, $context, $filearea, $args, $forcedownlo
  *
  * Here users are filtered by their activity avaialbility status.
  * if the pulse instance are available to user then it will send the notificaion to the user.
+ *
+ * @param  mixed $extend Extend the pro invitation method.
  * @return void
  */
 function mod_pulse_cron_task($extend=true) {
@@ -1302,8 +1304,4 @@ function mod_pulse_core_calendar_provide_event_action(calendar_event $event,
         1,
         true
     );
-}
-
-function mod_pulse_remove_mtrace_output($string, $eol) {
-    return 0;
 }
