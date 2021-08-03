@@ -15,25 +15,32 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Pulse module upgrade steps.
+ * Pulse instance test instance generate defined.
  *
  * @package   mod_pulse
  * @copyright 2021, bdecent gmbh bdecent.de
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die;
-
 /**
- * Pulse module upgrade steps.
- *
- * @param  mixed $oldversion Previous version.
- * @return void
+ * Pulse module instance generator.
  */
-function xmldb_pulse_upgrade($oldversion) {
-    global $CFG;
+class mod_pulse_generator extends testing_module_generator {
 
-    // Inital plugin release - v1.0.
-
-    return true;
+    /**
+     * Create pulse module instance.
+     *
+     * @param  mixed $record Module instance data.
+     * @param  array $options Additional options.
+     * @return void
+     */
+    public function create_instance($record = null, array $options = null) {
+        $record = (object) $record;
+        $record->showdescription = 1;
+        $record->pulse = 1;
+        if (!isset($record->diff_pulse)) {
+            $record->diff_pulse = 0;
+        }
+        return parent::create_instance($record, $options);
+    }
 }
