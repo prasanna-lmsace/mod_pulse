@@ -113,7 +113,6 @@ function pulse_delete_instance($pulseid) {
         $cm = get_coursemodule_from_instance('pulse', $pulseid);
 
         if ($DB->delete_records('pulse', ['id' => $pulseid])) {
-            // Remove pulse user notified records.
             pulse_extend_delete_instance($cm->id, $pulseid);
             return true;
         }
@@ -300,7 +299,19 @@ function mod_pulse_messagetouser($userto, $subject, $messageplain, $messagehtml,
     }
 }
 
-
+/**
+ * Get list of instance added in the course.
+ *
+ * @param  int $courseid Course id.
+ * @return array list of pulse instance added in the course.
+ */
+function pulse_course_instancelist($courseid) {
+    global $DB;
+    $sql = "SELECT cm.*, pl.name FROM {course_modules} cm
+            JOIN {pulse} pl ON pl.id = cm.instance
+            WHERE cm.course=:courseid AND cm.module IN (SELECT id FROM {modules} WHERE name=:pulse)";
+    return $DB->get_records_sql($sql, ['courseid' => $courseid, 'pulse' => 'pulse']);
+}
 
 /**
  * Serve the files from the Pulse file areas
@@ -356,12 +367,12 @@ function pulse_pluginfile($course, $cm, $context, $filearea, $args, $forcedownlo
  * if the pulse instance are available to user then it will send the notificaion to the user.
  * @return void
  */
-function mod_pulse_cron_task() {
+function mod_pulse_cron_task($extend=true) {
     global $DB;
 
     mtrace( 'Fetching notificaion instance list - MOD-Pulse INIT ');
 
-    if (pulse_extend_invitation()) {
+    if ($extend && pulse_extend_invitation()) {
         return true;
     }
 
@@ -375,11 +386,10 @@ function mod_pulse_cron_task() {
     list($roleinsql, $roleinparams) = $DB->get_in_or_equal($roles);
 
     $sql = "SELECT nt.id AS nid, nt.*, '' AS pulseend,
-        cm.id as cmid, cm.*, md.id AS mid, nou.id as nouid,
+        cm.id as cmid, cm.*, md.id AS mid,
         ctx.id as contextid, ctx.*, cu.id as courseid, cu.* FROM {pulse} nt
         JOIN {course_modules} cm ON cm.instance = nt.id
         JOIN {modules} md ON md.id = cm.module
-        LEFT JOIN {pulse_users} nou ON  nou.pulseid = nt.id
         JOIN {course} cu ON cu.id = nt.course
         RIGHT JOIN {context} ctx ON ctx.instanceid = cm.id and contextlevel = 70
         WHERE md.name = 'pulse' AND cm.visible = 1";
@@ -745,6 +755,7 @@ function mod_pulse_completion_crontask() {
                     $activitycompletion->userid = $user->id;
                     $activitycompletion->viewed = null;
                     $activitycompletion->overrideby = null;
+                    echo $user->coursemodulecompletionid;
                     if ($user->coursemodulecompletionid == '') {
                         $activitycompletion->completionstate = $result;
                         $activitycompletion->timemodified = time();
@@ -1189,11 +1200,14 @@ function pulse_extend_invitation() {
  */
 function pulse_extend_backup_steps($pulse, $userinfo) {
     $callbacks = get_plugins_with_function('extend_pulse_backup_steps');
-    foreach ($callbacks as $type => $plugins) {
-        foreach ($plugins as $plugin => $pluginfunction) {
-            return $pluginfunction($pulse, $userinfo);
+    if (!empty($callbacks)) {
+        foreach ($callbacks as $type => $plugins) {
+            foreach ($plugins as $plugin => $pluginfunction) {
+                return $pluginfunction($pulse, $userinfo);
+            }
         }
     }
+    return $pulse;
 }
 
 /**
@@ -1288,4 +1302,8 @@ function mod_pulse_core_calendar_provide_event_action(calendar_event $event,
         1,
         true
     );
+}
+
+function mod_pulse_remove_mtrace_output($string, $eol) {
+    return 0;
 }

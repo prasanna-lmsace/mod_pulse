@@ -97,9 +97,7 @@ class sendinvitation extends \core\task\adhoc_task {
                         $notifiedusers[] = $userto->id;
                     }
                 }
-                if ($addnotify) {
-                    mod_pulse_update_notified_users($notifiedusers, $pulse);
-                }
+                mod_pulse_update_notified_users($notifiedusers, $pulse);
             }
         }
     }
