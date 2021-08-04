@@ -15,32 +15,52 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Privacy Subsystem implementation for tool_recyclebin.
+ * Recycle bin events.
  *
  * @package    tool_recyclebin
- * @copyright  2018 Zig Tan <zig@moodle.com>
+ * @copyright  2015 University of Kent
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace tool_recyclebin\privacy;
+namespace tool_recyclebin\event;
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Privacy Subsystem for tool_recyclebin implementing null_provider.
+ * Event Class
  *
- * @copyright  2018 Zig Tan <zig@moodle.com>
+ * @package    tool_recyclebin
+ * @copyright  2015 University of Kent
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class provider implements \core_privacy\local\metadata\null_provider {
+class category_bin_item_restored extends \core\event\base {
 
     /**
-     * Get the language string identifier with the component's language
-     * file to explain why this plugin stores no data.
-     *
-     * @return  string
+     * Init method.
      */
-    public static function get_reason() : string {
-        return 'privacy:metadata';
+    protected function init() {
+        $this->data['objecttable'] = 'tool_recyclebin_category';
+        $this->data['crud'] = 'u';
+        $this->data['edulevel'] = self::LEVEL_OTHER;
+    }
+
+    /**
+     * Returns localised general event name.
+     *
+     * @return string
+     */
+    public static function get_name() {
+        return get_string('eventitemrestored', 'tool_recyclebin');
+    }
+
+    /**
+     * Returns description of what happened.
+     *
+     * @return string
+     */
+    public function get_description() {
+        return get_string('eventitemrestored_desc', 'tool_recyclebin', array(
+            'objectid' => $this->objectid
+        ));
     }
 }

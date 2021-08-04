@@ -15,33 +15,30 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * List of scheduled tasks to send pulses in background.
+ * Recycle bin tasks.
  *
- * @package   mod_pulse
- * @copyright 2021, bdecent gmbh bdecent.de
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    tool_recyclebin
+ * @copyright  2015 University of Kent
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die('No direct access !');
-
-$tasks = [
-    [
-        'classname' => 'mod_pulse\task\notify_users',
+$tasks = array(
+    array(
+        'classname' => 'tool_recyclebin\task\cleanup_course_bin',
         'blocking' => 0,
-        'minute' => '*',
+        'minute' => '*/30',
         'hour' => '*',
         'day' => '*',
-        'month' => '*',
         'dayofweek' => '*',
-    ],
-
-    [
-        'classname' => 'mod_pulse\task\update_completion',
+        'month' => '*'
+    ),
+    array(
+        'classname' => 'tool_recyclebin\task\cleanup_category_bin',
         'blocking' => 0,
-        'minute' => '*',
+        'minute' => '*/30',
         'hour' => '*',
         'day' => '*',
-        'month' => '*',
         'dayofweek' => '*',
-    ],
-];
+        'month' => '*'
+    )
+);

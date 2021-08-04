@@ -15,16 +15,15 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Pulse module version and name defined.
+ * Defines the version.
  *
- * @package   mod_pulse
- * @copyright 2021, bdecent gmbh bdecent.de
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    tool_recyclebin
+ * @copyright  2016 Skylar Kelty <S.Kelty@kent.ac.uk>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->component = 'mod_pulse'; // Name of this plugin.
-$plugin->version = 2021080300; // Released on 03 August 2021.
-$plugin->requires = 2020061500; // Requires Moodle 3.9.
-$plugin->release = 'v1.0';
+$plugin->version   = 2020110900; // The current plugin version (Date: YYYYMMDDXX).
+$plugin->requires  = 2020110300; // Requires this Moodle version.
+$plugin->component = 'tool_recyclebin'; // Full name of the plugin (used for diagnostics).

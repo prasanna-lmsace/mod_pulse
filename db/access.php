@@ -15,42 +15,43 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Define plugin capabilities.
+ * Plugin capabilities.
  *
- * @package   mod_pulse
- * @copyright 2021, bdecent gmbh bdecent.de
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    tool_recyclebin
+ * @copyright  2015 University of Kent
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
 $capabilities = array(
-    // Capability to add new pulse instances.
-    'mod/pulse:addinstance' => array(
-        'riskbitmask' => RISK_XSS,
+
+    'tool/recyclebin:deleteitems' => array(
+        'captype' => 'write',
+        'riskbitmask' => RISK_DATALOSS,
+        'contextlevel' => CONTEXT_COURSE,
+        'archetypes' => array(
+            'editingteacher' => CAP_ALLOW,
+            'manager' => CAP_ALLOW
+        )
+    ),
+
+    'tool/recyclebin:restoreitems' => array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_COURSE,
         'archetypes' => array(
             'editingteacher' => CAP_ALLOW,
             'manager' => CAP_ALLOW
-        ),
-        'clonepermissionsfrom' => 'moodle/course:manageactivities'
-    ),
-    // Capability to view pulses.
-    'mod/pulse:view' => array(
-        'captype' => 'read',
-        'contextlevel' => CONTEXT_MODULE,
-        'archetypes' => array(
-            'user' => CAP_ALLOW,
-            'guest' => CAP_ALLOW
         )
     ),
-    // Capability to recieve notifications.
-    'mod/pulse:notifyuser' => array(
+
+    'tool/recyclebin:viewitems' => array(
         'captype' => 'read',
-        'contextlevel' => CONTEXT_MODULE,
+        'contextlevel' => CONTEXT_COURSE,
         'archetypes' => array(
-            'student' => CAP_ALLOW,
+            'teacher' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+            'manager' => CAP_ALLOW
         )
-    ),
+    )
 );
