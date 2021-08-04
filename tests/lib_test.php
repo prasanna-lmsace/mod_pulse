@@ -47,7 +47,7 @@ class mod_pulse_lib_testcase extends advanced_testcase {
 
         $this->resetAfterTest();
         // Remove the output display of cron task.
-        // ...$CFG->mtrace_wrapper = 'mod_pulse_remove_mtrace_output';.
+        $CFG->mtrace_wrapper = 'mod_pulse_remove_mtrace_output';
         $this->course = $this->getDataGenerator()->create_course();
         $this->module = $this->getDataGenerator()->create_module('pulse', [
             'course' => $this->course->id, 'intro' => $this->intro
@@ -232,6 +232,31 @@ class mod_pulse_lib_testcase extends advanced_testcase {
         $this->assertEquals($instancemessage['text'], $message->fullmessage);
     }
 
+    /**
+     * Test the notifications are send to inactive users enrolments.
+     *
+     * @return void
+     */
+    public function test_user_inactive_enrolment() {
+        $timestart = strtotime('+1 day');
+        $timeend = strtotime('-1 day');
+
+        $user = $this->getDataGenerator()->create_and_enrol($this->course, 'student', [
+            'email' => 'testuser1@test.com', 'username' => 'testuser1'
+        ]);
+
+        $user = $this->getDataGenerator()->create_and_enrol($this->course, 'student', [
+            'email' => 'testuser2@test.com', 'username' => 'testuser2'
+        ], 'manual', $timestart);
+
+        $user = $this->getDataGenerator()->create_and_enrol($this->course, 'student', [
+            'email' => 'testuser2@test.com', 'username' => 'testuser3'
+        ], 'manual', '', $timeend);
+
+        $task = $this->send_message();
+        $messages = $task['messages'];
+        $this->assertCount(1, $messages);
+    }
 }
 
 /**
