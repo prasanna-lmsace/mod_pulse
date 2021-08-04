@@ -114,8 +114,9 @@ class sendinvitation extends \core\task\adhoc_task {
         if (!empty($senderdata->groupcontact)) {
             $groups = $senderdata->groupcontact;
             foreach ($groups as $groupid => $group) {
+                $group = (object) $group;
                 // Check student assigned in any group.
-                if (isset($group->students) && in_array($userid, $group->students)) {
+                if (isset($group->students) && in_array($userid, array_values($group->students))) {
                     if (!empty($group->sender)) { // Group has any teacher role to send notification.
                         return $group->sender;
                     }

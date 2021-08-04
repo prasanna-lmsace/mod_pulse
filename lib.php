@@ -441,14 +441,16 @@ function mod_pulse_cron_task($extend=true) {
                         AND roleid $roleinsql GROUP BY userid
                     ) ra ON ra.userid = eu1_u.id
             WHERE 1 = 1 AND ej1_ue.status = 0
-            AND (ej1_ue.timestart = 0 OR ej1_ue.timestart <= UNIX_TIMESTAMP(NOW()))
-            AND (ej1_ue.timeend = 0 OR ej1_ue.timeend > UNIX_TIMESTAMP(NOW()))
+            AND (ej1_ue.timestart = 0 OR ej1_ue.timestart <= ?)
+            AND (ej1_ue.timeend = 0 OR ej1_ue.timeend > ?)
             AND eu1_u.deleted = 0 AND eu1_u.id <> ? AND eu1_u.deleted = 0) je ON je.id = u.id
             WHERE u.deleted = 0 AND u.suspended = 0 ORDER BY u.lastname, u.firstname, u.id";
 
         $params[] = $course['id'];
         $params = array_merge($params, array_filter($inparams));
         $params = array_merge($params, array_filter($roleinparams));
+        $params[] = time();
+        $params[] = time();
         $params[] = 1;
         $students = $DB->get_records_sql($usersql, $params);
 
@@ -722,8 +724,8 @@ function mod_pulse_completion_crontask() {
                                         AND roleid $roleinsql
                                     ) ra ON ra.userid = eu1_u.id
                     WHERE 1 = 1 AND ej1_ue.status = 0
-                    AND (ej1_ue.timestart = 0 OR ej1_ue.timestart <= UNIX_TIMESTAMP(NOW()))
-                    AND (ej1_ue.timeend = 0 OR ej1_ue.timeend > UNIX_TIMESTAMP(NOW()))
+                    AND (ej1_ue.timestart = 0 OR ej1_ue.timestart <= ?)
+                    AND (ej1_ue.timeend = 0 OR ej1_ue.timeend > ?)
                     AND eu1_u.deleted = 0 AND eu1_u.id <> ? AND eu1_u.deleted = 0 AND eu1_u.suspended = 0
                 ) je ON je.id = u.id
             WHERE u.deleted = 0 AND u.suspended = 0 ORDER BY u.lastname, u.firstname, u.id";
@@ -733,6 +735,8 @@ function mod_pulse_completion_crontask() {
         $params[] = $cm['id'];
         $params = array_merge($params, array_filter($inparams));
         $params = array_merge($params, array_filter($roleinparams));
+        $params[] = time();
+        $params[] = time();
         $params[] = 1;
         $students = $DB->get_records_sql($usersql, $params);
 
@@ -757,7 +761,6 @@ function mod_pulse_completion_crontask() {
                     $activitycompletion->userid = $user->id;
                     $activitycompletion->viewed = null;
                     $activitycompletion->overrideby = null;
-                    echo $user->coursemodulecompletionid;
                     if ($user->coursemodulecompletionid == '') {
                         $activitycompletion->completionstate = $result;
                         $activitycompletion->timemodified = time();

@@ -107,26 +107,27 @@ class mod_pulse_lib_testcase extends advanced_testcase {
      * @return void
      */
     public function test_course_sender() {
-        $user = $this->getDataGenerator()->create_and_enrol($this->course, 'student', [
+        // Set force group mode.
+        $course = $this->getDataGenerator()->create_course(['groupmode' => 1, 'groupmodeforce' => 1]);
+        $user = $this->getDataGenerator()->create_and_enrol($course, 'student', [
             'email' => 'testuser1@test.com', 'username' => 'testuser1'
         ]);
-        $sender = $this->getDataGenerator()->create_and_enrol($this->course, 'editingteacher', [
+        $sender = $this->getDataGenerator()->create_and_enrol($course, 'editingteacher', [
             'email' => 'sender1@test.com', 'username' => 'sender1'
         ]);
-        $sender2 = $this->getDataGenerator()->create_and_enrol($this->course, 'editingteacher', [
+        $sender2 = $this->getDataGenerator()->create_and_enrol($course, 'editingteacher', [
             'email' => 'sender2@test.com', 'username' => 'sender2'
         ]);
-        $contacts = mod_pulse\task\sendinvitation::get_sender($this->course->id);
+        $contacts = mod_pulse\task\sendinvitation::get_sender($course->id);
         $coursecontact = $contacts->coursecontact;
-        $this->assertEquals($coursecontact->username, 'sender1');
-
+        $this->assertEquals('sender1', $coursecontact->username);
         // Assign teacher sender2 and user in group.
-        $groupid = $this->getDataGenerator()->create_group(array('courseid' => $this->course->id));
+        $groupid = $this->getDataGenerator()->create_group(array('courseid' => $course->id));
         $this->getDataGenerator()->create_group_member(array('userid' => $user, 'groupid' => $groupid));
         $this->getDataGenerator()->create_group_member(array('userid' => $sender2, 'groupid' => $groupid));
-        $contacts = mod_pulse\task\sendinvitation::get_sender($this->course->id);
-        $sender = \mod_pulse\task\sendinvitation::find_user_sender($contacts, $user);
-        $this->assertEquals($sender->username, 'sender2');
+        $contacts = mod_pulse\task\sendinvitation::get_sender($course->id);
+        $sender = \mod_pulse\task\sendinvitation::find_user_sender($contacts, $user->id);
+        $this->assertEquals('sender2', $sender->username);
     }
 
     /**
