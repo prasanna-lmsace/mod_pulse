@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Pulse module version and name defined.
+ * Define the message provider used in the pulse module.
  *
  * @package   mod_pulse
  * @copyright 2021, bdecent gmbh bdecent.de
@@ -24,7 +24,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->component = 'mod_pulse'; // Name of this plugin.
-$plugin->version = 2021080300; // Released on 03 August 2021.
-$plugin->requires = 2020061500; // Requires Moodle 3.9.
-$plugin->release = 'v1.0';
+$messageproviders = array(
+    'mod_pulse' => array(),
+);

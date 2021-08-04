@@ -15,16 +15,39 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Pulse module version and name defined.
+ * Scheduled cron task to completion pulse.
  *
  * @package   mod_pulse
  * @copyright 2021, bdecent gmbh bdecent.de
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace mod_pulse\task;
+
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->component = 'mod_pulse'; // Name of this plugin.
-$plugin->version = 2021080300; // Released on 03 August 2021.
-$plugin->requires = 2020061500; // Requires Moodle 3.9.
-$plugin->release = 'v1.0';
+/**
+ * Update user completion status for pulse. triggered from scheduled task.
+ */
+class update_completion extends \core\task\scheduled_task {
+
+    /**
+     * Return the task's name as shown in admin screens.
+     *
+     * @return string
+     */
+    public function get_name() {
+        return get_string('updatecompletion', 'mod_pulse');
+    }
+
+    /**
+     * Cron execution to send the available pulses.
+     *
+     * @return void
+     */
+    public function execute() {
+        global $CFG;
+        require_once($CFG->dirroot.'/mod/pulse/lib.php');
+        mod_pulse_completion_crontask();
+    }
+}

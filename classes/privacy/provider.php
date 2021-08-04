@@ -15,25 +15,20 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Privacy Subsystem implementation for tool_recyclebin.
+ * Privacy implementation for pulse module
  *
- * @package    tool_recyclebin
- * @copyright  2018 Zig Tan <zig@moodle.com>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package   mod_pulse
+ * @copyright 2021, bdecent gmbh bdecent.de
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-namespace tool_recyclebin\privacy;
+namespace mod_pulse\privacy;
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Privacy Subsystem for tool_recyclebin implementing null_provider.
- *
- * @copyright  2018 Zig Tan <zig@moodle.com>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * The mod_pulse module does not store any data.
  */
 class provider implements \core_privacy\local\metadata\null_provider {
-
     /**
      * Get the language string identifier with the component's language
      * file to explain why this plugin stores no data.
