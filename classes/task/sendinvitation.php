@@ -145,7 +145,7 @@ class sendinvitation extends \core\task\adhoc_task {
 
         list($roleinsql, $roleinparams) = $DB->get_in_or_equal($roles);
         $contextid = \context_course::instance($courseid)->id;
-        $usersql = "SELECT DISTINCT eu1_u.*, ra.*
+        $usersql = "SELECT eu1_u.*, ra.*
         FROM {user} eu1_u
         JOIN {user_enrolments} ej1_ue ON ej1_ue.userid = eu1_u.id
         JOIN {enrol} ej1_e ON (ej1_e.id = ej1_ue.enrolid AND ej1_e.courseid = ?)
