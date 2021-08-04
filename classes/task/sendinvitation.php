@@ -152,15 +152,17 @@ class sendinvitation extends \core\task\adhoc_task {
             SELECT DISTINCT userid, rle.shortname as roleshortname, roleid
                 FROM {role_assignments}
                 JOIN {role} rle ON rle.id = roleid
-                WHERE contextid = ? AND roleid $roleinsql GROUP BY userid
+                WHERE contextid = ? AND roleid $roleinsql GROUP BY userid, rle.shortname
             ) ra ON ra.userid = eu1_u.id
         WHERE 1 = 1 AND ej1_ue.status = 0
-        AND (ej1_ue.timestart = 0 OR ej1_ue.timestart <= UNIX_TIMESTAMP(NOW()))
-        AND ( ej1_ue.timeend = 0 OR ej1_ue.timeend > UNIX_TIMESTAMP(NOW()) )
+        AND (ej1_ue.timestart = 0 OR ej1_ue.timestart <= ? )
+        AND ( ej1_ue.timeend = 0 OR ej1_ue.timeend > ? )
         AND eu1_u.deleted = 0 AND eu1_u.suspended = 0 ORDER BY ej1_ue.timestart, ej1_ue.timecreated";
 
         array_unshift($roleinparams, $contextid);
         array_unshift($roleinparams, $courseid);
+        $roleinparams[] = time();
+        $roleinparams[] = time();
         $records = $DB->get_records_sql($usersql, $roleinparams);
         $teacherids = array_keys($records);
         // If no teachers enroled in course then use the support user.

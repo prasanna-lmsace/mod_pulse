@@ -100,10 +100,6 @@ class mod_pulse_lib_testcase extends advanced_testcase {
         $this->send_message();
         $result = pulseis_notified($students[0]->id, $this->module->id);
         $this->assertTrue($result);
-        // Filter students.
-        $availableusers = mod_pulse_get_course_students($students, $instance);
-        
-        $this->assertEquals(0, count($availableusers));
     }
     /**
      * Test the pulse fetch course senders for send notification.
