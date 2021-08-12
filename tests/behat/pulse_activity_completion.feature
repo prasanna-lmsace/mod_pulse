@@ -30,92 +30,87 @@ Feature: View activity completion information in the pulse activity
     And I expand all fieldsets
     And I click on "[name='pulse'][type='checkbox']" "css_element"
     And I press "Save and return to course"
-    # And I navigate to "Edit settings" in current page administration
-    # And I set the following fields to these values:
-    #   | Enable completion tracking | Yes |
-    #   | Show activity completion conditions | Yes |
-    # And I press "Save and display"
 
-    @javascript
-    Scenario: View automatic completion items
-        Given I am on "Course 1" course homepage with editing mode on
-        And I click on "Edit" "link" in the ".modtype_pulse" "css_element"
-        And I click on ".menu-action-text" "css_element" in the ".modtype_pulse" "css_element"
-        And I set the following fields to these values:
-        | Completion tracking  | Show activity as complete when conditions are met |
-        And I click on "Completion when available" "checkbox"
-        And I press "Save and return to course"
-        # Teacher view.
-        And "Test pulse 1" should have the "Restrictions must be met" completion condition
-        And I log out
-        # Student view.
-        When I log in as "student1"
-        And I am on "Course 1" course homepage
-        And I should see "Test pulse 1"
-        Then the "Restriction Met" completion condition of "Test pulse 1" is displayed as "done"
+  @javascript
+  Scenario: View automatic completion items
+    Given I am on "Course 1" course homepage with editing mode on
+    And I click on "Edit" "link" in the ".modtype_pulse" "css_element"
+    And I click on ".menu-action-text" "css_element" in the ".modtype_pulse" "css_element"
+    And I set the following fields to these values:
+    | Completion tracking  | Show activity as complete when conditions are met |
+    And I click on "Completion when available" "checkbox"
+    And I press "Save and return to course"
+    # Teacher view.
+    And "Test pulse 1" should have the "Restrictions must be met" completion condition
+    And I log out
+    # Student view.
+    When I log in as "student1"
+    And I am on "Course 1" course homepage
+    And I should see "Test pulse 1"
+    Then the "Restriction Met" completion condition of "Test pulse 1" is displayed as "done"
 
-    @javascript
-    Scenario: Use manual completion
-        Given I am on "Course 1" course homepage with editing mode on
-        And I click on "Edit" "link" in the ".modtype_pulse" "css_element"
-        And I click on ".menu-action-text" "css_element" in the ".modtype_pulse" "css_element"
-        And I set the following fields to these values:
-        | Completion tracking | Students can manually mark the activity as completed |
-        And I press "Save and return to course"
-        # Teacher view.
-        And the manual completion button for "Test pulse 1" should be disabled
-        And I log out
-        # Student view.
-        When I log in as "student1"
-        And I am on "Course 1" course homepage
-        Then the manual completion button of "Test pulse 1" is displayed as "Mark as done"
-        And I toggle the manual completion state of "Test pulse 1"
-        And the manual completion button of "Test pulse 1" is displayed as "Done"
+  @javascript
+  Scenario: Use manual completion
+    Given I am on "Course 1" course homepage with editing mode on
+    And I click on "Edit" "link" in the ".modtype_pulse" "css_element"
+    And I click on ".menu-action-text" "css_element" in the ".modtype_pulse" "css_element"
+    And I set the following fields to these values:
+      | Completion tracking | Students can manually mark the activity as completed |
+    And I press "Save and return to course"
+    # Teacher view.
+    And the manual completion button for "Test pulse 1" should be disabled
+    And I log out
+    # Student view.
+    When I log in as "student1"
+    And I am on "Course 1" course homepage
+    Then the manual completion button of "Test pulse 1" is displayed as "Mark as done"
+    And I toggle the manual completion state of "Test pulse 1"
+    And the manual completion button of "Test pulse 1" is displayed as "Done"
 
-    @javascript
-    Scenario: Use manual mark as complete completion
-        Given I am on "Course 1" course homepage with editing mode on
-        And I click on "Edit" "link" in the ".modtype_pulse" "css_element"
-        And I click on ".menu-action-text" "css_element" in the ".modtype_pulse" "css_element"
-        And I set the following fields to these values:
-        | Completion tracking | Show activity as complete when conditions are met    |
-        And I click on "Mark as complete by student to complete this activity" "checkbox"
-        And I press "Save and return to course"
-        # Teacher view.
-        And "Test pulse 1" should have the "Mark complete" completion condition
-        And I should not see "Mark complete" in the ".pulse-completion-btn" "css_element"
-        And I log out
-        # Student view.
-        When I log in as "student1"
-        And I am on "Course 1" course homepage
-        And I should see "Test pulse 1"
-        And I should see "Mark complete" in the ".pulse-completion-btn" "css_element"
-        When I click on "Mark complete" "link"
-        And I should see "Marked as completed" in the ".notifications" "css_element"
-        Then the "Self marked complete on" completion condition of "Test pulse 1" is displayed as "done"
+  @javascript
+  Scenario: Use manual mark as complete completion
+    Given I am on "Course 1" course homepage with editing mode on
+    And I click on "Edit" "link" in the ".modtype_pulse" "css_element"
+    And I click on ".menu-action-text" "css_element" in the ".modtype_pulse" "css_element"
+    And I set the following fields to these values:
+      | Completion tracking | Show activity as complete when conditions are met    |
+    And I click on "Mark as complete by student to complete this activity" "checkbox"
+    And I press "Save and return to course"
+    # Teacher view.
+    And "Test pulse 1" should have the "Mark complete" completion condition
+    And I should not see "Mark complete" in the ".pulse-completion-btn" "css_element"
+    And I log out
+    # Student view.
+    When I log in as "student1"
+    And I am on "Course 1" course homepage
+    And I should see "Test pulse 1"
+    And I should see "Mark complete" in the ".pulse-completion-btn" "css_element"
+    When I click on "Mark complete" "link"
+    And I should see "Marked as completed" in the ".notifications" "css_element"
+    Then the "Self marked complete on" completion condition of "Test pulse 1" is displayed as "done"
 
-    @javascript
-    Scenario: Use manual completion Required by approval complete.
-        Given I am on "Course 1" course homepage with editing mode on
-        And I click on "Edit" "link" in the ".modtype_pulse" "css_element"
-        And I click on ".menu-action-text" "css_element" in the ".modtype_pulse" "css_element"
-        And I set the following fields to these values:
-        | Completion tracking | Show activity as complete when conditions are met    |
-        And I click on "Require approval by one of the following roles" "checkbox"
-        And I click on ".form-autocomplete-downarrow" "css_element" in the "#fgroup_id_completionrequireapproval" "css_element"
-        And I click on "Teacher" "list_item" in the "#fgroup_id_completionrequireapproval [class='form-autocomplete-suggestions']" "css_element"
-        And I press "Save and return to course"
-        # Teacher view.
-        And "Test pulse 1" should have the "Approval required" completion condition
-        And I should see "Approve users" in the ".pulse-completion-btn" "css_element"
-        And I click on "Approve users" "link" in the ".pulse-completion-btn" "css_element"
-        And I should see "Student User 1" in the "participants" "table"
-        When I click on "Approve" "link" in the "Student User 1" "table_row"
-        And I should see "User approved successfully" in the ".notifications" "css_element"
-        And I should see "Approved" in the "Student User 1" "table_row"
-        And I log out
-        # Student view
-        When I log in as "student1"
-        And I am on "Course 1" course homepage
-        And I should see "Test pulse 1"
-        Then the "Approved on" completion condition of "Test pulse 1" is displayed as "done"
+  @javascript
+  Scenario: Use manual completion Required by approval complete.
+    Given I am on "Course 1" course homepage with editing mode on
+    And I click on "Edit" "link" in the ".modtype_pulse" "css_element"
+    And I click on ".menu-action-text" "css_element" in the ".modtype_pulse" "css_element"
+    And I set the following fields to these values:
+      | Completion tracking | Show activity as complete when conditions are met    |
+    And I click on "Require approval by one of the following roles" "checkbox"
+    And I click on ".form-autocomplete-downarrow" "css_element" in the "#fgroup_id_completionrequireapproval" "css_element"
+    And I click on "Teacher" "list_item" in the "#fgroup_id_completionrequireapproval [class='form-autocomplete-suggestions']" "css_element"
+    And I press "Save and return to course"
+    # Teacher view.
+    And "Test pulse 1" should have the "Approval required" completion condition
+    And I should see "Approve users" in the ".pulse-completion-btn" "css_element"
+    And I click on "Approve users" "link" in the ".pulse-completion-btn" "css_element"
+    And I should see "Student User 1" in the "participants" "table"
+    When I click on "Approve" "link" in the "Student User 1" "table_row"
+    And I should see "User approved successfully" in the ".notifications" "css_element"
+    And I should see "Approved" in the "Student User 1" "table_row"
+    And I log out
+    # Student view
+    When I log in as "student1"
+    And I am on "Course 1" course homepage
+    And I should see "Test pulse 1"
+    Then the "Approved on" completion condition of "Test pulse 1" is displayed as "done"
