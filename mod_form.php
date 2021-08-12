@@ -189,7 +189,6 @@ class mod_pulse_mod_form extends moodleform_mod {
                 || !empty($data['completionapproval']) || !empty($data['completionself']) );
     }
 
-
     /**
      * Prepare the data after form was submited.
      *
@@ -205,7 +204,6 @@ class mod_pulse_mod_form extends moodleform_mod {
         $data->completionavailable = isset($data->completionwhenavailable) ? 1 : 0;
         $data->completionself = isset($data->completionself) ? 1 : 0;
         $data->completionapproval = isset($data->completionapproval) ? 1 : 0;
-
 
         if (isset($data->completionapprovalroles)) {
             $data->completionapprovalroles = json_encode($data->completionapprovalroles);
