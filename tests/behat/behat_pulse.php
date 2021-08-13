@@ -53,9 +53,10 @@ class behat_pulse extends behat_base {
     /**
      * Check that the activity has the given automatic completion condition.
      *
-     * @Given /^"(?P<activityname>(?:[^"]|\\")*)" should have the "(?P<conditionname>(?:[^"]|\\")*)" completion condition type "(?P<completiontype>(?:[^"]|\\")*)"$/
+     * @Given /^"((?:[^"]|\\")*)" should have the "((?:[^"]|\\")*)" completion condition type "((?:[^"]|\\")*)"$/
      * @param string $activityname The activity name.
      * @param string $conditionname The automatic condition name.
+     * @param string $completiontype The completion type text.
      */
     public function activity_should_have_the_completion_condition_type(string $activityname,
         string $conditionname, string $completiontype): void {
@@ -72,7 +73,7 @@ class behat_pulse extends behat_base {
     /**
      * Checks if the activity with specified name is maked as complete.
      *
-     * @Given /^the "(?P<conditionname>(?:[^"]|\\")*)" "(?P<completiontype>(?:[^"]|\\")*)" completion condition of "(?P<activityname>(?:[^"]|\\")*)" is displayed as "(?P<completionstatus>(?:[^"]|\\")*)"$/
+     * @Given /^the "([^"]*)" "([^"]*)" completion condition of "([^"]*)" is displayed as "([^"]*)"$/
      * @param string $conditionname The completion condition text.
      * @param string $completiontype The completion type text.
      * @param string $activityname The activity name.
@@ -92,9 +93,8 @@ class behat_pulse extends behat_base {
     /**
      * Checks if the activity with specified name is maked as complete.
      *
-     * @Given /^I should see "(?P<conditionname>(?:[^"]|\\")*)" completion condition of "(?P<activityname>(?:[^"]|\\")*)" is displayed as "(?P<completionstatus>(?:[^"]|\\")*)"$/
+     * @Given /^I should see "([^"]*)" completion condition of "([^"]*)" is displayed as "([^"]*)"$/
      * @param string $conditionname The completion condition text.
-     * @param string $completiontype The completion type text.
      * @param string $activityname The activity name.
      * @param string $completionstatus The completion status. Must be either of the following: 'todo', 'done', 'failed'.
      */

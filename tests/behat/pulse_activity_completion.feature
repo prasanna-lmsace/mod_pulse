@@ -50,7 +50,6 @@ Feature: View activity completion information in the pulse activity
     And I should see "Test pulse 1"
     Then the "Restriction Met" "auto" completion condition of "Test pulse 1" is displayed as "done"
 
-
   @javascript
   Scenario: Use manual mark as complete completion
     Given I am on "Course 1" course homepage with editing mode on
