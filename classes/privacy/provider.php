@@ -292,13 +292,13 @@ class provider implements
 
 
     /**
-     * Helper function to export attendance logs.
+     * Helper function to export completions.
      *
-     * The array of "attendances" is actually the result returned by the SQL in export_user_data.
+     * The array of "completions" is actually the result returned by the SQL in export_user_data.
      * It is more of a list of sessions. Which is why it needs to be grouped by context id.
      *
      * @param string $path The path in the export (relative to the current context).
-     * @param array $attendances Array of attendances to export the logs for.
+     * @param array $completions Array of completions to export the logs for.
      * @param stdclass $user User record object.
      */
     private static function export_pulse_completions(string $path, array $completions, $user) {
@@ -322,7 +322,8 @@ class provider implements
                     } else {
                         return [
                             'selfcomplete' => (($completion->selfcompletion == 1) ? get_string('yes') : get_string('no')),
-                            'selfcompletiontime' => $completion->selfcompletiontime ? transform::datetime($completion->selfcompletiontime) : '-',
+                            'selfcompletiontime' => $completion->selfcompletiontime
+                                ? transform::datetime($completion->selfcompletiontime) : '-',
                             'approved' => (($completion->approved == 1) ? get_string('yes') : get_string('no')),
                             'approvaltime' => $completion->approvedtime ? transform::datetime($completion->approvedtime) : '-',
                             'invitaion' => self::generate_invitationdata($completion->pid, $user->id)
