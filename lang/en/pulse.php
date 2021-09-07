@@ -153,7 +153,7 @@ $string['pulsenotavailable'] = 'Pulse instance not added in course';
 $string['notassignedgroup'] = 'User must be part of a group to filter by participants.';
 $string['pulsepro:viewreports'] = 'View pulse pro reports';
 $string['reactionthankmsg'] = 'Thank you! We have saved your reaction <br> <span>You can now close this window</span>';
-// Privacy api strings
+// Privacy api strings.
 $string['privacy:completion'] = 'Completion';
 $string['approvedby'] = 'approvedby';
 $string['completionfor'] = 'completionfor';

@@ -139,13 +139,22 @@ class provider implements
         ];
 
          // Discussion authors.
-        $sql = "SELECT d.userid, d.approveduser
+        $sql = "SELECT d.userid
         FROM {course_modules} cm
         JOIN {modules} m ON m.id = cm.module AND m.name = :modulename
         JOIN {pulse} f ON f.id = cm.instance
         JOIN {pulse_completion} d ON d.pulseid = f.id
         WHERE cm.id = :instanceid";
         $userlist->add_from_sql('userid', $sql, $params);
+
+        // Approved users.
+        $sql = "SELECT d.approveduser
+        FROM {course_modules} cm
+        JOIN {modules} m ON m.id = cm.module AND m.name = :modulename
+        JOIN {pulse} f ON f.id = cm.instance
+        JOIN {pulse_completion} d ON d.pulseid = f.id
+        WHERE cm.id = :instanceid";
+        $userlist->add_from_sql('approveduser', $sql, $params);
 
         $sql = "SELECT d.userid
         FROM {course_modules} cm
@@ -173,6 +182,11 @@ class provider implements
         $sql = "pulseid = :pulseid AND userid {$userinsql}";
         $DB->delete_records_select('pulse_completion', $sql, $params);
         $DB->delete_records_select('pulse_users', $sql, $params);
+
+        $sql = "pulseid = :pulseid AND approveduser {$userinsql}";
+        $DB->set_field_select('pulse_completion', 'approvalstatus', 0, $sql, $params);
+        $DB->set_field_select('pulse_completion', 'approvaltime', '', $sql, $params);
+        $DB->set_field_select('pulse_completion', 'approveduser', '', $sql, $params);
     }
 
     /**
@@ -193,9 +207,9 @@ class provider implements
             $DB->delete_records('pulse_completion', ['pulseid' => $instanceid, 'userid' => $userid]);
             $DB->delete_records('pulse_users', ['pulseid' => $instanceid, 'userid' => $userid]);
 
-            $DB->set_field('pulse_completion', 'approvalstatus', 0, ['pulseid' => $instanceid, 'userid' => $userid]);
-            $DB->set_field('pulse_completion', 'approvaltime', '', ['pulseid' => $instanceid, 'userid' => $userid]);
-            $DB->set_field('pulse_completion', 'approveduser', '', ['pulseid' => $instanceid, 'userid' => $userid]);
+            $DB->set_field('pulse_completion', 'approvalstatus', 0, ['pulseid' => $instanceid, 'approveduser' => $userid]);
+            $DB->set_field('pulse_completion', 'approvaltime', '', ['pulseid' => $instanceid, 'approveduser' => $userid]);
+            $DB->set_field('pulse_completion', 'approveduser', '', ['pulseid' => $instanceid, 'approveduser' => $userid]);
         }
     }
 
@@ -213,7 +227,7 @@ class provider implements
 
         $cm = get_coursemodule_from_id('pulse', $context->instanceid);
         if (!$cm) {
-            return ;
+            return;
         }
         $DB->delete_records('pulse_completion', ['pulseid' => $cm->instance]);
         $DB->delete_records('pulse_users', ['pulseid' => $cm->instance]);
@@ -233,10 +247,10 @@ class provider implements
         // Context user.
         $user = $contextlist->get_user();
         list($contextsql, $contextparams) = $DB->get_in_or_equal($contextlist->get_contextids(), SQL_PARAMS_NAMED);
-        $sql = "SELECT cm.id AS cmid, c.id AS contextid,
-                   p.id AS pid, p.course AS pcourse,
-                   pc.id AS completionid, pc.userid AS userid, pc.selfcompletion AS selfcompletion, pc.selfcompletiontime AS selfcompletiontime,
-                   pc.approvalstatus AS approved, pc.approvaltime AS approvedtime, pc.approveduser AS approvedby
+        $sql = "SELECT pc.id AS completionid, cm.id AS cmid, c.id AS contextid,
+                p.id AS pid, p.course AS pcourse,
+                pc.userid AS userid, pc.selfcompletion AS selfcompletion, pc.selfcompletiontime AS selfcompletiontime,
+                pc.approvalstatus AS approved, pc.approvaltime AS approvedtime, pc.approveduser AS approvedby
               FROM {context} c
         INNER JOIN {course_modules} cm ON cm.id = c.instanceid AND c.contextlevel = :contextlevel
         INNER JOIN {modules} m ON m.id = cm.module AND m.name = :modname
@@ -253,9 +267,16 @@ class provider implements
         ];
         $completions = $DB->get_records_sql($sql, $params + $contextparams);
 
-        if (empty($completions)) {
-            return;
-        }
+        self::export_pulse_completions(
+            get_string('completionfor', 'mod_pulse'),
+            array_filter(
+                $completions,
+                function(stdClass $completion) use ($contextlist) : bool {
+                    return $completion->userid == $contextlist->get_user()->id;
+                }
+            ),
+            $user
+        );
 
         self::export_pulse_completions(
             get_string('approvedby', 'mod_pulse'),
@@ -263,17 +284,6 @@ class provider implements
                 $completions,
                 function(stdClass $completion) use ($contextlist) : bool {
                     return $completion->approvedby == $contextlist->get_user()->id;
-                }
-            ),
-            $user
-        );
-
-        self::export_pulse_completions(
-            get_string('completionfor', 'mod_pulse'),
-            array_filter(
-                $completions,
-                function(stdClass $completion) use ($contextlist) : bool {
-                    return $completion->userid == $contextlist->get_user()->id;
                 }
             ),
             $user
@@ -289,6 +299,7 @@ class provider implements
      *
      * @param string $path The path in the export (relative to the current context).
      * @param array $attendances Array of attendances to export the logs for.
+     * @param stdclass $user User record object.
      */
     private static function export_pulse_completions(string $path, array $completions, $user) {
 
@@ -340,13 +351,13 @@ class provider implements
      * @param int $userid Id of the export user.
      * @return array|null Current and previous invitations send to user.
      */
-    public static function generate_invitationdata(int $pulseid,int $userid): ?array {
+    public static function generate_invitationdata(int $pulseid, int $userid): ?array {
         global $DB;
         if ($records = $DB->get_records('pulse_users', ['pulseid' => $pulseid, 'userid' => $userid])) {
-            $previousinvitedata = $current= [];
+            $previousinvitedata = $current = [];
             $invitations = array_reverse(self::group_by_property($records, 'status'));
             if (empty($invitations)) {
-                return null;
+                return [];
             }
             $invitedata = $invitations[0] ?? [];
             if (!empty($invitedata)) {
@@ -367,6 +378,7 @@ class provider implements
 
             return $current + $previousinvitedata;
         }
+        return [];
     }
 
 
