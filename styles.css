@@ -71,32 +71,32 @@
 }
 
 #page-mod-pulse-mod .col-md-4.pulse-preset-item {
-    max-width: 30% !important;
+    max-width: 30%;
 }
 
 #page-mod-pulse-mod .manage-presets {
     text-align: right;
 }
 
-.promotional-content {
+#page-mod-pulse-mod .promotional-content {
     display: flex;
     align-items: center;
     padding: 10px;
-    margin: 10p;
+    margin: 10px;
     margin-left: 15px;
     justify-content: space-between;
 }
 
-.pulse-preset-promotional {
-    background: #6C757D;
+#page-mod-pulse-mod .pulse-preset-promotional {
+    background: #6c757d;
     color: #fff;
     font-weight: bold;
 }
 
-.learn-more .btn-default {
+#page-mod-pulse-mod .learn-more .btn-default {
     background-color: #fff;
 }
 
-.preset-config-params [data-fieldtype="submit"] {
+#page-mod-pulse-mod .preset-config-params [data-fieldtype="submit"] {
     display: none;
 }
