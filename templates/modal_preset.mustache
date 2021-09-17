@@ -1,0 +1,11 @@
+{{< core/modal }}
+    {{$title}}{{#str}} pluginname, mod_pulse {{/str}}{{/title}}
+    {{$body}}
+    {{/body}}
+    {{$footer}}
+        <span id="loader-icon"></span>
+        <button type="button" class="btn btn-primary" data-action="customize">{{#str}} apply_customize, mod_pulse {{/str}}</button>
+        <button type="button" class="btn btn-primary" data-action="save">{{#str}} apply_save, mod_pulse {{/str}}</button>
+        <button type="button" class="btn btn-secondary" data-action="cancel">{{#str}} cancel {{/str}}</button>
+    {{/footer}}
+{{/ core/modal }}

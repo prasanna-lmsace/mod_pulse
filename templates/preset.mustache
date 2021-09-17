@@ -1,0 +1,37 @@
+
+{{! 
+
+    Pulse preset template preview popup content.
+ }}
+
+<div class="pulse-preset-preview">
+    <div class="pulse-preset-preview-parent">
+        <div class="preset-preview-content">
+            <div class="preset-item-content">
+                {{#title}}
+                <div class="preset-title">
+                    <h5> {{{title}}} </h5>
+                </div>
+                {{/title}}
+
+                {{#description}}
+                    <div class="description">
+                        {{{description}}}
+                    </div>
+                {{/description}}
+
+                {{#instruction}}
+                    <div class="description">
+                        {{{instruction}}}
+                    </div>
+                {{/instruction}}
+
+                {{#configparams}}
+                <div class="preset-config-params">
+                    {{{configparams}}}
+                </div>
+                {{/configparams}}
+            </div>
+        </div>
+    </div>
+</div>  
