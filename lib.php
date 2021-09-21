@@ -1346,6 +1346,18 @@ function pulse_preset_update($pulseid, $configdata) {
     }
 }
 
+function mod_pulse_output_fragment_get_presetslist(array $args) {
+    global $OUTPUT;
+    $context = $args['context'];
+
+    if ($context->contextlevel !== CONTEXT_COURSE && $context->contextlevel !== CONTEXT_MODULE) {
+        return null;
+    }
+    $courseid = $args['courseid'];
+    $presets = \mod_pulse\preset::generate_presets_list($courseid);
+    return $OUTPUT->render_from_template('mod_pulse/presets_list', $presets);
+}
+
 /**
  * Fragement output to preview the selected preset. Loads all the available informations and configurable params as form elements.
  *
@@ -1389,16 +1401,19 @@ function mod_pulse_output_fragment_apply_preset(array $args) : ?string {
 /**
  * Create presets during the plugin installation and upgradation.
  *
+ * @param array $presets List of presets with details.
  * @param boolean $pro Create template for pro version.
  * @return array List of created presets id.
  */
-function pulse_create_presets($pro=false) {
+function pulse_create_presets($presets=[], $pro=false) {
     global $DB, $CFG;
     if (!isloggedin() || isguestuser()) {
         return;
     }
     $fs = get_file_storage();
-    $presets = pulse_free_presets();
+    if (empty($presets)) {
+        $presets = pulse_free_presets();
+    }
     foreach ($presets as $key => $preset) {
         $sql = "SELECT id FROM {pulse_presets} WHERE ".$DB->sql_like('title', ':title');
         if ($DB->record_exists_sql($sql, ['title' => $preset['title']])) {
@@ -1439,7 +1454,7 @@ function pulse_free_presets(): array {
     $preset1 = array(
         'title' => 'Demo preset 1',
         'description' => 'This is demo preset 1 to test',
-        'configparams' => json_encode(['name' => 'General \ Title', 'introeditor' => 'General \ Content']),
+        'configparams' => json_encode(['name', 'introeditor']),
         'preset_template' => 'preset-demo-1.mbz',
         'status' => 1,
         'icon' => 'core:a/download_all',
@@ -1448,7 +1463,7 @@ function pulse_free_presets(): array {
     $preset2 = array(
         'title' => 'Demo preset 2',
         'description' => 'This is demo preset 2 to test',
-        'configparams' => json_encode(['name' => 'General \ Title', 'introeditor' => 'General \ Content']),
+        'configparams' => json_encode(['name', 'introeditor']),
         'preset_template' => 'preset-demo-2.mbz',
         'status' => 1,
         'icon' => 'core:a/add_file',

@@ -25,6 +25,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'mod_pulse'; // Name of this plugin.
-$plugin->version = 2021091700; // Released on 26 August 2021.
+$plugin->version = 2021092100; // Released on 26 August 2021.
 $plugin->requires = 2020061500; // Requires Moodle 3.9.
 $plugin->release = 'v1.0';
+$plugin->maturity = MATURITY_ALPHA;
+$plugin->supported = [39, 311];
