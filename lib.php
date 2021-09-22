@@ -1459,9 +1459,9 @@ function pulse_create_presets($presets=[], $pro=false) {
  */
 function pulse_free_presets(): array {
     global $CFG;
-    if (file_exists($CFG->dirroot.'\mod\pulse\assets\presets.xml')) {
+    if (file_exists($CFG->dirroot.'/mod/pulse/assets/presets.xml')) {
         echo "exists";
-        $presetsxml = simplexml_load_file($CFG->dirroot.'\mod\pulse\assets\presets.xml') or die("Failed to load");
+        $presetsxml = simplexml_load_file($CFG->dirroot.'/mod/pulse/assets/presets.xml');
         echo "xml";
         print_r($presetsxml);
         $result = json_decode(json_encode($presetsxml), true);
