@@ -1413,7 +1413,7 @@ function mod_pulse_output_fragment_apply_preset(array $args) : ?string {
 function pulse_create_presets($presets=[], $pro=false) {
     global $DB, $CFG;
     if (!isloggedin() || isguestuser()) {
-        return;
+        return [];
     }
     $fs = get_file_storage();
     if (empty($presets)) {
@@ -1457,9 +1457,8 @@ function pulse_create_presets($presets=[], $pro=false) {
  */
 function pulse_free_presets(): array {
     global $CFG;
-
-    if (file_exists($CFG->dirroot.'\mod\pulse\assets\presets.xml')) {
-        $presetsxml = file_get_contents($CFG->dirroot.'\mod\pulse\assets\presets.xml');
+    if (file_exists($CFG->wwwroot.'\mod\pulse\assets\presets.xml')) {
+        $presetsxml = file_get_contents($CFG->wwwroot.'\mod\pulse\assets\presets.xml');
         $result = json_decode(json_encode(simplexml_load_string($presetsxml)), true);
         return $result;
     }
