@@ -85,7 +85,6 @@ class mod_pulse_mod_form extends moodleform_mod {
         // Use Differnet pulse content for pulse.
         $resend = $mform->addElement('submit', 'resend_pulse', get_string('resendnotification', 'pulse'));
         $mform->addHelpButton('resend_pulse', 'resendnotification', 'mod_pulse');
-        
 
         // Use Different notification content.
         $mform->addElement('advcheckbox', 'diff_pulse', get_string('diffnotification', 'pulse'),

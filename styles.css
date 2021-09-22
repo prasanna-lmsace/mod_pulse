@@ -60,7 +60,7 @@
 .pulse-presets-list .pulse-preset-item {
     height: 100%;
     text-align: center;
-    border: 1px solid #ccc;   
+    border: 1px solid #ccc;
     box-shadow: 1px 2px 10px 1px #ccc;
     padding: 20px;
 }
@@ -107,6 +107,7 @@
 #page-mod-pulse-mod .preset-item-content .preset-title h5 {
     font-weight: 600;
 }
+
 #page-mod-pulse-mod .preset-item-content .badge.badge-secondary {
     white-space: normal;
 }

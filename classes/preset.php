@@ -114,10 +114,12 @@ class preset extends \moodleform  {
      * @param stdclass $coursecontext Course context.
      */
     public function __construct(int $presetid, int $courseid, $coursecontext=null) {
+        global $COURSE;
         $this->courseid = $courseid;
         $this->presetid = $presetid;
         $this->course = get_course($courseid);
         $this->presetdata();
+        $COURSE = $this->course;
         $this->pulseform = self::pulseform_instance($this->courseid);
         parent::__construct();
     }
@@ -125,12 +127,13 @@ class preset extends \moodleform  {
     /**
      * Create pulse mod form instance.
      *
+     * @param int $courseid ID of course.
      * @param int $section Section number.
      * @return mod_pulse_mod_form mod_pulse form instance.
      */
     public static function pulseform_instance(int $courseid, int $section=1) {
         $course = get_course($courseid);
-        list($module, $context, $cw, $cm, $data) = \prepare_new_moduleinfo_data($course, 'pulse', 0);
+        list($module, $context, $cw, $cm, $data) = \prepare_new_moduleinfo_data($course, 'pulse', $section);
         $pulseform = new \mod_pulse_mod_form($data, $section, $cm, $course);
         return $pulseform;
     }
@@ -273,7 +276,7 @@ class preset extends \moodleform  {
      * @param int $courseid Id of course.
      * @return array List of available form fields.
      */
-    public static function get_pulse_config_list($courseid, $pulseform=null): array {
+    public static function get_pulse_config_list($courseid): array {
 
         $fields = array();
         $header = '';

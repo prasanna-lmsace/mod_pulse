@@ -1346,6 +1346,11 @@ function pulse_preset_update($pulseid, $configdata) {
     }
 }
 
+/**
+ * Fragement output to list all the presets in the pulse module add/edit form.
+ *
+ * @param array $args context and Course ID with context.
+ */
 function mod_pulse_output_fragment_get_presetslist(array $args) {
     global $OUTPUT;
     $context = $args['context'];

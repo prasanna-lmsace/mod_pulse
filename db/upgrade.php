@@ -64,6 +64,8 @@ function xmldb_pulse_upgrade($oldversion) {
             $dbman->create_table($table);
         }
         pulse_create_presets();
+        // Pulse savepoint reached.
+        upgrade_mod_savepoint(true, 2021091700, 'pulse');
     }
 
     if ($oldversion < 2021091701) {

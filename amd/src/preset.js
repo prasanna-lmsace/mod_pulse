@@ -115,11 +115,12 @@ define(['jquery', 'core/modal_factory', 'mod_pulse/modal_preset', 'mod_pulse/eve
 
         if (listParent !== null) {
             if (listParent.getAttribute(this.listElement.loaded) == 'false') {
-                Fragment.loadFragment('mod_pulse', 'get_presetslist', this.contextId, {'courseid': this.courseid}).done((html, js) => {
+                Fragment.loadFragment('mod_pulse', 'get_presetslist', this.contextId, {'courseid': this.courseid})
+                .done((html, js) => {
                     Templates.replaceNodeContents(listParent, html, js);
                     listParent.setAttribute(this.listElement.loaded, 'true');
                     this.setupmodal();
-                })
+                });
             }
         }
     };
