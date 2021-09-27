@@ -417,8 +417,9 @@ class preset extends \moodleform  {
         foreach ($config as $key => $value) {
 
             if ($key == 'completionapprovalroles') {
-                $value = json_encode($config['completionapprovalroles']);
-            } 
+                $value = (is_array($config['completionapprovalroles']))
+                        ? json_encode($config['completionapprovalroles']) : '';
+            }
 
             if (is_array($value)) {
                 $config[$key] = $this->clear_empty_data($value);
@@ -521,7 +522,8 @@ class preset extends \moodleform  {
         }
 
         // Update completion fields.
-        $configdata['completionavailable'] = isset($configdata['completionwhenavailable']) ? $configdata['completionwhenavailable'] : '';
+        $configdata['completionavailable'] = isset($configdata['completionwhenavailable'])
+                ? $configdata['completionwhenavailable'] : '';
 
         if (class_exists('\local_pulsepro\presets\preset_form')) {
             \local_pulsepro\presets\preset_form::clean_configdata($configdata);
@@ -645,26 +647,36 @@ class preset extends \moodleform  {
             $configdata['availability'] = $configdata['availabilityconditionsjson'];
             unset($configdata['availabilityconditionsjson']);
         }
-        if (isset($configdata['section']) && !empty($configdata['section'])) {
-            $section = $configdata['section'];
-            if ($sectionid = $DB->get_field('course_modules', 'section', ['id' => $configdata['id']])) {
-                // Add the mod id to new section sequence.
-                $params = ['course' => $configdata['courseid'], 'section' => $section];
-                if ($newsection = $DB->get_record('course_sections', $params)) {
-                    $sequence = ($newsection->sequence) ? explode(',', $newsection->sequence) : [];
-                    array_push($sequence, $configdata['id']);
-                    $newsection->sequence = ($sequence) ? implode(',', $sequence) : $configdata['id'];
-                    if ($DB->update_record('course_sections', $newsection)) {
-                        $DB->set_field('course_modules', 'section', $newsection->id, ['id' => $configdata['id']]);
+        try {
+            $transaction = $DB->start_delegated_transaction();
+            if (isset($configdata['section']) && !empty($configdata['section'])) {
+                $section = $configdata['section'];
+                if ($sectionid = $DB->get_field('course_modules', 'section', ['id' => $configdata['id']])) {
+                    // Remove the mod id from current section sequence.
+                    if ($currentsection = $DB->get_record('course_sections', ['id' => $sectionid])) {
+                        $sequence = ($currentsection->sequence) ? explode(',', $currentsection->sequence) : [];
+                        $currentsection->sequence = ($sequence)
+                            ? implode(',', array_diff($sequence, [$configdata['id']])) : $configdata['id'];
+                        $DB->update_record('course_sections', $currentsection);
                     }
+
+                    // Add the mod id to new section sequence.
+                    $params = ['course' => $configdata['courseid'], 'section' => $section];
+                    if ($newsection = $DB->get_record('course_sections', $params)) {
+                        $sequence = ($newsection->sequence) ? explode(',', $newsection->sequence) : [];
+                        array_push($sequence, $configdata['id']);
+                        $newsection->sequence = ($sequence) ? implode(',', $sequence) : $configdata['id'];
+                        if ($DB->update_record('course_sections', $newsection)) {
+                            $DB->set_field('course_modules', 'section', $newsection->id, ['id' => $configdata['id']]);
+                        }
+                    }
+
                 }
-                // Remove the mod id from current section sequence.
-                if ($currentsection = $DB->get_record('course_sections', ['id' => $sectionid])) {
-                    $sequence = ($currentsection->sequence) ? explode(',', $currentsection->sequence) : [];
-                    $currentsection->sequence = ($sequence)
-                        ? implode(',', array_diff($sequence, [$configdata['id']])) : $configdata['id'];
-                    $DB->update_record('course_sections', $currentsection);
-                }
+            }
+            $transaction->allow_commit();
+        } catch (\Exception $e) {
+            if (!empty($transaction) && !$transaction->is_disposed()) {
+                $transaction->rollback($e);
             }
         }
         unset($configdata['section']);
