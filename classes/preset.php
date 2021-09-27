@@ -229,7 +229,7 @@ class preset extends \moodleform  {
                         ? $configlist[$element->_name] : $elem->_label;
                     $this->_form->addElement($elem);
                     $this->_form->addElement('hidden', $elem->_name.'_changed', false);
-                } else if (in_array($element->_attributes['name'], $configparams)) {
+                } else if (isset($element->_attributes['name']) && in_array($element->_attributes['name'], $configparams)) {
                     $elementname = $element->_attributes['name'];
                     $elem = $this->pulseform->_form->getElement($elementname);
                     $attributename = $elem->_attributes['name'];
@@ -238,7 +238,6 @@ class preset extends \moodleform  {
                         // Using same names in editor elements in same page, not load the text editors in second elements.
                         $elem->_attributes['name'] = 'preseteditor_'.$elem->_attributes['name'];
                     }
-
                     $elem->_label = isset($configlist[$attributename])
                         ? $configlist[$attributename] : $elem->_label;
                     $this->_form->addElement($elem);
@@ -416,6 +415,11 @@ class preset extends \moodleform  {
     public function clear_empty_data(array $config): array {
 
         foreach ($config as $key => $value) {
+
+            if ($key == 'completionapprovalroles') {
+                $value = json_encode($config['completionapprovalroles']);
+            } 
+
             if (is_array($value)) {
                 $config[$key] = $this->clear_empty_data($value);
                 continue;
@@ -515,6 +519,9 @@ class preset extends \moodleform  {
             $configdata['pulse_contentformat'] = $configdata['pulse_contenteditor']['format'];
             $configdata['pulse_content'] = $configdata['pulse_contenteditor']['text'];
         }
+
+        // Update completion fields.
+        $configdata['completionavailable'] = isset($configdata['completionwhenavailable']) ? $configdata['completionwhenavailable'] : '';
 
         if (class_exists('\local_pulsepro\presets\preset_form')) {
             \local_pulsepro\presets\preset_form::clean_configdata($configdata);
