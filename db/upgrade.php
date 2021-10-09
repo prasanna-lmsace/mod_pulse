@@ -101,7 +101,7 @@ function xmldb_pulse_upgrade($oldversion) {
             $dbman->add_field($pulsetable, $cssclass);
         }
 
-        upgrade_mod_savepoint(true, 2021100801, 'pulse');
+        upgrade_mod_savepoint(true, 2021100800, 'pulse');
     }
 
     return true;
