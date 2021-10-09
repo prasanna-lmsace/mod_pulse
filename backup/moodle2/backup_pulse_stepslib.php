@@ -25,7 +25,7 @@
 defined('MOODLE_INTERNAL') || die('No direct access !');
 
 /**
- * Define the complete pulse structure for backup, with file and id annotations
+ * Define the complete pulse structure for backup, with file and id annotations.
  */
 class backup_pulse_activity_structure_step extends backup_activity_structure_step {
 

@@ -281,13 +281,13 @@ class preset extends \moodleform  {
      */
     public static function generate_presets_list(int $courseid) {
         global $DB, $OUTPUT, $PAGE;
+        $link = '';
+        $pluginmanager = core_plugin_manager::instance()->get_installed_plugins('local');
+        if (array_key_exists('pulsepro', $pluginmanager)) {
+            $link = new \moodle_url('/local/pulsepro/presets.php');
+        }
         if ($records = $DB->get_records('pulse_presets', ['status' => 1], 'order_no ASC')) {
             $presets = [];
-            $pluginmanager = core_plugin_manager::instance()->get_installed_plugins('local');
-            $link = '';
-            if (array_key_exists('pulsepro', $pluginmanager)) {
-                $link = new \moodle_url('/local/pulsepro/presets.php');
-            }
             $configlist = self::get_pulse_config_list($courseid);
 
             foreach ($records as $presetid => $record) {
@@ -315,6 +315,7 @@ class preset extends \moodleform  {
             }
             return ['presetslist' => (!empty($presets) ? 1 : 0), 'presets' => $presets, 'managepresets' => $link];
         }
+        return ['managepresets' => $link];
     }
 
     /**
