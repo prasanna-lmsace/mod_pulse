@@ -1555,7 +1555,7 @@ function mod_pulse_cm_info_view(cm_info $cm) {
         $boxtype = ($pulse->boxtype) ? $pulse->boxtype : 'primary';
         $boxicon = ($pulse->boxicon) ? $pulse->boxicon : '';
         $content = $cm->content;
-        $content = mod_pulse_render_content($content, $boxtype, $boxicon);
+        $content = mod_pulse_render_content($content, $boxicon, $boxtype);
         $cm->set_content($content);
     }
 
@@ -1571,8 +1571,8 @@ function mod_pulse_cm_info_view(cm_info $cm) {
  * Render the pulse content with selected box container with box icon.
  *
  * @param string $content Pulse content.
- * @param string $boxtype Box type name (primary, secondory, danger, warning and others).
  * @param string $boxicon Icon.
+ * @param string $boxtype Box type name (primary, secondory, danger, warning and others).
  * @return string Pulse content with box container.
  */
 function mod_pulse_render_content(string $content, string $boxicon, string $boxtype = 'primary'): string {

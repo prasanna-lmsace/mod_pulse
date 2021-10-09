@@ -79,7 +79,7 @@ function xmldb_pulse_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2021091701, 'pulse');
     }
 
-    if ($oldversion <= 2021100800) {
+    if ($oldversion < 2021100800) {
 
         $pulsetable = new xmldb_table('pulse');
         $displaymode = new xmldb_field('displaymode', XMLDB_TYPE_INTEGER, '2', null, null, null, '0', 'credits_status');
