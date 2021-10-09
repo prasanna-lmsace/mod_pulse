@@ -1575,7 +1575,7 @@ function mod_pulse_cm_info_view(cm_info $cm) {
  * @param string $boxicon Icon.
  * @return string Pulse content with box container.
  */
-function mod_pulse_render_content(string $content, string $boxtype = 'primary', string $boxicon): string {
+function mod_pulse_render_content(string $content, string $boxicon, string $boxtype = 'primary'): string {
     global $OUTPUT;
     $html = html_writer::start_tag('div', ['class' => 'pulse-box']);
     $html .= html_writer::start_tag('div', ['class' => 'alert alert-'.$boxtype]);
