@@ -229,6 +229,12 @@ class preset extends \moodleform  {
                         ? $configlist[$element->_name] : $elem->_label;
                     $this->_form->addElement($elem);
                     $this->_form->addElement('hidden', $elem->_name.'_changed', false);
+                    if (isset($elem->_elements) && !empty($elem->_elements)) {
+                        foreach ($elem->_elements as $key => $subelem) {
+                            $subname = $subelem->_attributes['name'];
+                            $this->_form->addElement('hidden', $subname.'_changed', false);
+                        }
+                    }
                 } else if (isset($element->_attributes['name']) && in_array($element->_attributes['name'], $configparams)) {
                     $elementname = $element->_attributes['name'];
                     $elem = $this->pulseform->_form->getElement($elementname);
@@ -575,8 +581,9 @@ class preset extends \moodleform  {
                     unset($configdata['introeditor']);
                     // Update the pro reminder contents.
                     pulse_preset_update($pulseid, $configdata);
-                    if (!empty($configdata) && self::hasupdatefields($configdata)) {
+                    if (!empty($configdata)) {
                         $configdata['id'] = $pulseid;
+                        $configdata['timemodified'] = time();
                         $DB->update_record('pulse', (object) $configdata);
                     }
                     // Update course modules.
