@@ -1548,10 +1548,10 @@ function mod_pulse_cm_info_view(cm_info $cm) {
     global $DB;
 
     $pulse = $DB->get_record('pulse', ['id' => $cm->instance]);
-    if ($pulse->cssclass) {
+    if (isset($pulse->cssclass) && $pulse->cssclass) {
         $cm->set_extra_classes($pulse->cssclass);
     }
-    if ($pulse->displaymode == 1) {
+    if (isset($pulse->displaymode) && $pulse->displaymode == 1) {
         $boxtype = ($pulse->boxtype) ? $pulse->boxtype : 'primary';
         $boxicon = ($pulse->boxicon) ? $pulse->boxicon : '';
         $content = $cm->content;
