@@ -646,6 +646,8 @@ class preset extends \moodleform  {
             $form = $this->prepare_modform($formdata);
             // Send to replace the form.
             return $form;
+        } else {
+            $this->controller->destroy();
         }
     }
 
