@@ -249,7 +249,6 @@ class preset extends \moodleform  {
                     $this->_form->addElement($elem);
                     $this->_form->addElement('hidden', $attributename.'_changed', false);
                 }
-                // exit;
             }
             $this->add_action_buttons(false, 's');
         }
@@ -555,9 +554,13 @@ class preset extends \moodleform  {
         // Restore controller.
         $this->controller = new \restore_controller($backuptempdir, $this->courseid, \backup::INTERACTIVE_NO,
         \backup::MODE_IMPORT, $USER->id, $method);
-
-        if ($configdata['importmethod'] == 'save') {
+        // Check the backup file is valid.
+        try {
             $this->controller->execute_precheck();
+        } catch (\Exception $e) {
+            throw new \moodle_exception('precheckfails', 'error');
+        }
+        if ($configdata['importmethod'] == 'save') {
             $this->controller->execute_plan();
             foreach ($this->controller->get_plan()->get_tasks() as $key => $task) {
                 if ($task instanceof \restore_activity_task) {
