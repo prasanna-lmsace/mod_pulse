@@ -65,4 +65,3 @@ Feature: Pulse appearance display modes
     And I am on "Test" course homepage
     Then I should see "pulse box mode"
     And ".pulse-appearance-custom-class" "css_element" should exist in the "#section-1" "css_element"
-    
