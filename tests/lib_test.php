@@ -47,7 +47,7 @@ class mod_pulse_lib_testcase extends advanced_testcase {
 
         $this->resetAfterTest();
         // Remove the output display of cron task.
-        $CFG->mtrace_wrapper = 'mod_pulse_remove_mtrace_output';
+        // $CFG->mtrace_wrapper = 'mod_pulse_remove_mtrace_output';
         $this->course = $this->getDataGenerator()->create_course();
         $this->module = $this->getDataGenerator()->create_module('pulse', [
             'course' => $this->course->id, 'intro' => $this->intro
@@ -163,6 +163,7 @@ class mod_pulse_lib_testcase extends advanced_testcase {
         // Run all adhoc task to send notification.
         phpunit_util::run_all_adhoc_tasks();
         $messages = $slink->get_messages();
+        print_r($messages);
         return ['tasklist' => $tasklist, 'messages' => $messages];
     }
 
