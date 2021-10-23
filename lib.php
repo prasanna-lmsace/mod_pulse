@@ -450,7 +450,6 @@ function mod_pulse_cron_task($extend=true) {
                 JOIN (SELECT DISTINCT eu1_u.id
                 FROM {user} eu1_u
                 JOIN {user_enrolments} ej1_ue ON ej1_ue.userid = eu1_u.id
-                JOIN {enrol} ej1_e ON (ej1_e.id = ej1_ue.enrolid AND ej1_e.courseid = ?)
                 JOIN (SELECT DISTINCT userid
                         FROM {role_assignments}
                         WHERE contextid $insql
@@ -478,8 +477,8 @@ function mod_pulse_cron_task($extend=true) {
         $instance->context = (object) $context;
         $instance->cm = (object) $cm;
         $instance->students = $students;
+        pulse_set_notification_adhoc($instance);
     }
-    pulse_set_notification_adhoc($instance);
     mtrace('Pulse message sending completed....');
     return true;
 }
