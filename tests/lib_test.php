@@ -163,7 +163,6 @@ class mod_pulse_lib_testcase extends advanced_testcase {
         // Run all adhoc task to send notification.
         phpunit_util::run_all_adhoc_tasks();
         $messages = $slink->get_messages();
-        print_r($messages);
         return ['tasklist' => $tasklist, 'messages' => $messages];
     }
 
