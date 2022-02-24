@@ -29,6 +29,8 @@ define( 'MAX_PULSE_NAME_LENGTH', 50);
 global $PAGE;
 
 require_once($CFG->libdir."/completionlib.php");
+require_once($CFG->dirroot.'/lib/filelib.php');
+require_once($CFG->dirroot.'/mod/pulse/locallib.php');
 
 /**
  * Add pulse instance.
@@ -257,7 +259,7 @@ function mod_pulse_get_course_students($students, $instance) {
     // Filter available users.
     pulse_mtrace('Filter users based on their availablity..');
     foreach ($students as $student) {
-        $modinfo = \course_modinfo::instance((object) $instance->course, $student->id);
+        $modinfo = new \course_modinfo((object) $instance->course, $student->id);
         $cm = $modinfo->get_cm($instance->cm->id);
         if (!$cm->uservisible || pulseis_notified($student->id, $instance->pulse->id)) {
             unset($students[$student->id]);
@@ -426,7 +428,6 @@ function mod_pulse_cron_task($extend=true) {
         $pulseendpos = array_search('pulseend', $keys);
         $pulse = array_slice($record, 0, $pulseendpos);
         $pulse['id'] = $pulse['nid'];
-        pulse_mtrace( 'Initiate pulse module - '.$pulse['name'] );
         // Context.
         $ctxpos = array_search('contextid', $keys);
         $ctxendpos = array_search('locked', $keys);
@@ -441,6 +442,7 @@ function mod_pulse_cron_task($extend=true) {
         $coursepos = array_search('courseid', $keys);
         $course = array_slice($record, $coursepos);
         $course['id'] = $course['courseid'];
+        pulse_mtrace( 'Initiate pulse module - '.$pulse['name'].' course - '. $course['id'] );
         // Get enrolled users with capability.
         $contextlevel = explode('/', $context['path']);
         list($insql, $inparams) = $DB->get_in_or_equal(array_filter($contextlevel));
@@ -596,21 +598,24 @@ function pulse_get_completion_state($course, $cm, $userid, $type, $pulse=null, $
     if ($completion == null) {
         $completion = $DB->get_record('pulse_completion', ['userid' => $userid, 'pulseid' => $pulse->id]);
     }
-    $status = COMPLETION_INCOMPLETE;
+    $status = $type;
     // Module availablity completion for student.
     if ($pulse->completionavailable) {
         if ($modinfo == null) {
             $modinfo = get_fast_modinfo($course->id, $userid);
+            $cm = $modinfo->get_cm($cm->id);
+            $isvisble = $cm->uservisible;
+        } else {
+            $cm = $modinfo->get_cm($cm->id);
+            $info = new \core_availability\info_module($cm);
+            $str = '';
+            // Get section info for cm.
+            // Check section is accessable by user.
+            $section = $cm->get_section_info();
+            $sectioninfo = new \core_availability\info_section($section);
+            $isvisble = pulse_mod_uservisible($cm, $userid, $sectioninfo, $modinfo, $info);
         }
-        $cm = $modinfo->get_cm($cm->id);
-        $info = new \core_availability\info_module($cm);
-        $str = '';
-        // Get section info for cm.
-        // Check section is accessable by user.
-        $section = $cm->get_section_info();
-        $sectioninfo = new \core_availability\info_section($section);
-
-        if ($sectioninfo->is_available($str, false, $userid, $modinfo) && $info->is_available($str, false, $userid, $modinfo )) {
+        if ($isvisble) {
             $status = COMPLETION_COMPLETE;
         } else {
             return COMPLETION_INCOMPLETE;
@@ -637,6 +642,29 @@ function pulse_get_completion_state($course, $cm, $userid, $type, $pulse=null, $
     return $status;
 }
 
+/**
+ * Check user has access to the module
+ *
+ * @param cm_info $cm Course Module instance
+ * @param int $userid User record id
+ * @param \core_availability\info_section $sectioninfo Section availability info
+ * @param  course_modinfo $modinfo course Module info.
+ * @param \core_availability\info_module $info Module availability info.
+ * @return void
+ */
+function pulse_mod_uservisible($cm, $userid, $sectioninfo, $modinfo, $info) {
+    $context = $cm->context;
+    if ((!$cm->visible && !has_capability('moodle/course:viewhiddenactivities', $context, $userid))) {
+        return false;
+    }
+
+    $str = '';
+    if ($sectioninfo->is_available($str, false, $userid, $modinfo)
+        && $info->is_available($str, false, $userid, $modinfo )) {
+        return true;
+    }
+    return false;
+}
 /**
  * Seperate the record data into context and course and cm.
  * In function mod_pulse_completion_crontask, data fetched using JOIN queries,
@@ -716,7 +744,7 @@ function mod_pulse_completion_crontask() {
         $pulse = array_slice($record, 0, $pulseendpos);
         $pulse['id'] = $pulse['nid'];
 
-        pulse_mtrace("Check the user module completion - Pulse id: ".$pulse['id']);
+        pulse_mtrace("Check the user module completion - Pulse name: ".$pulse['name']);
         // Precess results.
         list($course, $context, $cm) = pulse_process_recorddata($keys, $record);
         // Get enrolled users with capability.
@@ -727,7 +755,7 @@ function mod_pulse_completion_crontask() {
                 FROM {user} u
                 JOIN (
                     SELECT DISTINCT eu1_u.id, pc.id as pcid, pc.userid as userid, pc.pulseid,
-                    pc.approvalstatus, pc.selfcompletion, cmc.id as coursemodulecompletionid
+                    pc.approvalstatus, pc.selfcompletion, cmc.id as coursemodulecompletionid, cmc.completionstate as completionstate
                         FROM {user} eu1_u
                         JOIN {user_enrolments} ej1_ue ON ej1_ue.userid = eu1_u.id
                         JOIN {enrol} ej1_e ON (ej1_e.id = ej1_ue.enrolid AND ej1_e.courseid = ?)
@@ -768,10 +796,14 @@ function mod_pulse_completion_crontask() {
                 $context = context_module::instance($cm->id);
                 if ($completion->is_enabled($cm) ) {
                     foreach ($students as $key => $user) {
-                        $modinfo[$course->id]->changeuserid($user->id);
+                        $modinfo[$course->id]->set_userid($user->id);
                         $md = $modinfo[$course->id];
                         // Get pulse module completion state for user.
-                        $result = pulse_get_completion_state($course, $cm, $user->id, COMPLETION_UNKNOWN, $pulse, $user, $md);
+                        $currentstate = ($user->completionstate) ?? COMPLETION_INCOMPLETE;
+                        $result = pulse_get_completion_state($course, $cm, $user->id, $currentstate, $pulse, $user, $md);
+                        if (isset($user->completionstate) && $result == $currentstate) {
+                            continue;
+                        }
                         $activitycompletion = new \stdclass();
                         $activitycompletion->coursemoduleid = $cm->id;
                         $activitycompletion->userid = $user->id;
@@ -1094,8 +1126,9 @@ function pulse_user_isstudent($cmid) {
     $modulecontext = context_module::instance($cmid);
     $roles = get_user_roles($modulecontext, $USER->id);
     $hasrole = false;
+    $studentroles = array_keys(get_archetype_roles('student'));
     foreach ($roles as $key => $role) {
-        if ($role->shortname == 'student') {
+        if (in_array($role->roleid, $studentroles)) {
             $hasrole = true;
             break;
         }
