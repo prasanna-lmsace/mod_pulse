@@ -22,12 +22,14 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace mod_pulse;
+
 defined( 'MOODLE_INTERNAL') || die(' No direct access ');
 
 /**
  * Pulse resource preset create and customize settings phpunit test cases defined.
  */
-class mod_pulse_preset_testcase extends advanced_testcase {
+class preset_test extends \advanced_testcase {
 
     /**
      * Setup the course and admin user to test the presets.
@@ -68,7 +70,7 @@ class mod_pulse_preset_testcase extends advanced_testcase {
         $records = $DB->get_records('pulse_presets');
         $record = reset($records);
 
-        $preset = new mod_pulse\preset($record->id, $this->course->id, $this->coursecontext);
+        $preset = new \mod_pulse\preset($record->id, $this->course->id, $this->coursecontext);
         $configdata = ['importmethod' => 'save', 'presetid' => $record->id, 'name' => 'Welcome Message'];
         $result = $preset->apply_presets($configdata);
         $result = json_decode($result);
@@ -91,7 +93,7 @@ class mod_pulse_preset_testcase extends advanced_testcase {
         $record = reset($records);
         $customname = 'Welcome Message';
         $subject = 'Preset pulse subject - customize';
-        $preset = new mod_pulse\preset($record->id, $this->course->id, $this->coursecontext);
+        $preset = new \mod_pulse\preset($record->id, $this->course->id, $this->coursecontext);
 
         $configdata = [
             'importmethod' => 'customize', 'presetid' => $record->id, 'name' => $customname, 'pulse_subject' => $subject
