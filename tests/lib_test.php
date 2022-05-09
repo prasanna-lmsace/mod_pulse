@@ -24,9 +24,6 @@
 
 namespace mod_pulse;
 
-defined( 'MOODLE_INTERNAL') || die(' No direct access ');
-
-
 /**
  * Pulse resource phpunit test cases defined.
  */
@@ -59,7 +56,7 @@ class lib_test extends \advanced_testcase {
 
     /**
      * Test the pulse student test function to check it identifies the students.
-     *
+     * @covers ::pulse_user_isstudent
      * @return void
      */
     public function test_is_studentuser() {
@@ -78,7 +75,7 @@ class lib_test extends \advanced_testcase {
 
     /**
      * Test course students count based on sending notification.
-     *
+     * @covers ::mod_pulse_get_course_students
      * @return void
      */
     public function test_get_course_students() {
@@ -105,7 +102,7 @@ class lib_test extends \advanced_testcase {
     }
     /**
      * Test the pulse fetch course senders for send notification.
-     *
+     * @covers \mod_pulse\task\sendinvitation::find_user_sender
      * @return void
      */
     public function test_course_sender() {
@@ -134,7 +131,7 @@ class lib_test extends \advanced_testcase {
 
     /**
      * Test pulse email placeholder filters function.
-     *
+     * @covers ::mod_pulse_update_emailvars
      * @return void
      */
     public function test_pulse_update_email_vars() {
@@ -151,7 +148,7 @@ class lib_test extends \advanced_testcase {
 
     /**
      * Send messages.
-     *
+     * @covers ::mod_pulse_cron_task
      * @return void
      */
     public function send_message() {
@@ -170,7 +167,7 @@ class lib_test extends \advanced_testcase {
 
     /**
      * Test pulse sends the message for enrolled users.
-     *
+     * @covers ::send_message
      * @return void
      */
     public function test_pulse_sending_messages() {
@@ -201,7 +198,7 @@ class lib_test extends \advanced_testcase {
 
     /**
      * test_pulse_different_message
-     *
+     * @covers ::pulse_different_message
      * @return void
      */
     public function test_pulse_different_message() {
@@ -236,7 +233,7 @@ class lib_test extends \advanced_testcase {
 
     /**
      * Test the notifications are send to inactive users enrolments.
-     *
+     * @covers ::send_message
      * @return void
      */
     public function test_user_inactive_enrolment() {

@@ -24,8 +24,6 @@
 
 namespace mod_pulse;
 
-defined( 'MOODLE_INTERNAL') || die(' No direct access ');
-
 /**
  * Pulse resource preset create and customize settings phpunit test cases defined.
  */
@@ -47,7 +45,7 @@ class preset_test extends \advanced_testcase {
     /**
      * Test case to insert method for presets, this function creates the default already defined presets
      * which is shipped with plugin source installation.
-     *
+     * @covers ::pulse_create_presets
      * @return void
      */
     public function test_pulse_create_presets() {
@@ -61,7 +59,7 @@ class preset_test extends \advanced_testcase {
 
     /**
      * Test the create pulse activity using the preset method apply and save with custom configurable params.
-     *
+     * @covers ::apply_presets
      * @return void
      */
     public function test_apply_save_preset(): void {
@@ -83,7 +81,7 @@ class preset_test extends \advanced_testcase {
 
     /**
      * Test the create pulse activity using the preset method apply and customize with custom configurable params.
-     *
+     * @covers ::customize_preset
      * @return void
      */
     public function test_apply_customize_preset() {
