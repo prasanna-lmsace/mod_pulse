@@ -22,10 +22,16 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace mod_pulse;
+
+defined('MOODLE_INTERNAL') || die('No direct access');
+
+require_once($CFG->dirroot.'/lib/modinfolib.php');
+
 /**
  * Course modinfo wrapper.
  */
-class pulse_course_modinfo extends course_modinfo {
+class pulse_course_modinfo extends \course_modinfo {
 
     /**
      * Userid to check the group availability.
@@ -64,7 +70,7 @@ class pulse_course_modinfo extends course_modinfo {
      * @param  mixed $userid
      * @return void
      */
-    public function changeuserid($userid) {
+    public function set_userid($userid) {
         $this->groupuserid = $userid;
     }
 
@@ -75,7 +81,6 @@ class pulse_course_modinfo extends course_modinfo {
      * @return int[] Array of int (group id) => int (same group id again); empty array if none
      */
     public function get_groups($groupingid = 0) {
-
         $allgroups = groups_get_user_groups($this->get_course_id(), $this->groupuserid);
         if (!isset($allgroups[$groupingid])) {
             return array();

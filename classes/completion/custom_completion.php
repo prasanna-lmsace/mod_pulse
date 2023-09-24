@@ -54,19 +54,9 @@ class custom_completion extends activity_custom_completion {
             case 'completionwhenavailable':
                 if ($pulse->completionavailable) {
                     $modinfo = get_fast_modinfo($this->cm->course, $this->userid);
-                    $info = new \core_availability\info_module($this->cm);
-                    $str = '';
-                    // Get section info for cm.
-                    // Check section is accessable by user.
-                    $section = $this->cm->get_section_info();
-                    $sectioninfo = new \core_availability\info_section($section);
+                    $cm = $modinfo->get_cm($this->cm->id);
 
-                    if ($sectioninfo->is_available($str, false, $this->userid, $modinfo)
-                        && $info->is_available($str, false, $this->userid, $modinfo )) {
-                        $status = COMPLETION_COMPLETE;
-                    } else {
-                        $status = COMPLETION_INCOMPLETE;
-                    }
+                    $status = $cm->get_user_visible() ? COMPLETION_COMPLETE : COMPLETION_INCOMPLETE;
                 }
                 break;
             case 'completionapproval':
@@ -94,7 +84,7 @@ class custom_completion extends activity_custom_completion {
                 break;
         }
 
-        return (isset($status) && $status) ? COMPLETION_COMPLETE : COMPLETION_INCOMPLETE;
+        return (isset($status) && $status) ? $status : COMPLETION_INCOMPLETE;
     }
 
 
@@ -144,7 +134,7 @@ class custom_completion extends activity_custom_completion {
         $selfstring = get_string('completion:self', 'pulse');
         $approvalstring = get_string('completion:approval', 'pulse');
 
-        if (pulse_user_isstudent($this->cm->id)) {
+        if (\mod_pulse\helper::pulse_user_isstudent($this->cm->id)) {
             if ( $this->is_available('completionwhenavailable') ) {
                 $state = $this->get_state('completionwhenavailable');
                 if (in_array($state, [COMPLETION_COMPLETE, COMPLETION_COMPLETE_PASS])) {
@@ -155,7 +145,7 @@ class custom_completion extends activity_custom_completion {
             if ($this->is_available('completionself') ) {
                 $state = $this->get_state('completionself');
                 if (in_array($state, [COMPLETION_COMPLETE, COMPLETION_COMPLETE_PASS])) {
-                    $date = pulse_already_selfcomplete($this->cm->instance, $this->userid);
+                    $date = \mod_pulse\helper::pulse_already_selfcomplete($this->cm->instance, $this->userid);
                     $selfstring = get_string('selfmarked', 'pulse', ['date' => $date]);
                 }
             }
@@ -163,7 +153,7 @@ class custom_completion extends activity_custom_completion {
             if ($this->is_available('completionapproval') ) {
                 $state = $this->get_state('completionapproval');
                 if (in_array($state, [COMPLETION_COMPLETE, COMPLETION_COMPLETE_PASS])) {
-                    $message = pulse_user_approved($this->cm->instance, $this->userid);
+                    $message = \mod_pulse\helper::pulse_user_approved($this->cm->instance, $this->userid);
                     $approvalstring = html_to_text($message);
                 }
             }

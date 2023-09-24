@@ -17,43 +17,135 @@
  * Module javascript to place the placeholders.
  * Modified version of IOMAD Email template emailvars.
  *
- * @package   mod_pulse
+ * @module   mod_pulse/module
  * @category  Classes - autoloading
  * @copyright 2021, bdecent gmbh bdecent.de
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define([], function() {
+define(['core_editor/events'], function() {
 
     return {
-
         /**
          * Setup the classes to editors works with placeholders.
          */
         init: function() {
             var module = this;
+
             var templatevars = document.getElementsByClassName("fitem_id_templatevars_editor");
             for (var l = 0; l < templatevars.length; l++) {
                 templatevars[l].addEventListener('click', function() {
                     var EditorInput = document.getElementById('id_pulse_content_editoreditable');
-                    var caret = document.getElementsByClassName("insertatcaretactive");
-                    for (var j = 0; j < caret.length; j++) {
-                        caret[j].classList.remove("insertatcaretactive");
+                    if (EditorInput !== null) {
+                        module.insertCaretActive(EditorInput);
                     }
-                    EditorInput.classList.add("insertatcaretactive");
-
                 });
             }
+
+            var notificationheader = document.getElementById('admin-notificationheader');
+            if (notificationheader !== null) {
+                notificationheader.addEventListener('click', function() {
+                    var EditorInput = document.getElementById('id_s_mod_pulse_notificationheadereditable');
+                    module.insertCaretActive(EditorInput);
+                });
+            }
+
+            var notificationfooter = document.getElementById('admin-notificationfooter');
+            if (notificationfooter !== null) {
+                notificationfooter.addEventListener('click', function() {
+                    var EditorInput = document.getElementById('id_s_mod_pulse_notificationfootereditable');
+                    module.insertCaretActive(EditorInput);
+                });
+            }
+
+            templatevars = document.getElementsByClassName("fitem_id_templatevars_editor");
+            if (templatevars) {
+                templatevars.forEach((elem) => {
+                    elem.addEventListener('click', function(e) {
+                        var target = e.currentTarget;
+                        var EditorInput = target.querySelector('[id*="_editoreditable"]');
+                        module.insertCaretActive(EditorInput);
+                    });
+                });
+            }
+
+            // Console.log(window.tinyMCE.get());
+            var targetNode = document.querySelector('textarea[id$=_editor]');
+            if (targetNode !== null) {
+                var observer = new MutationObserver(function() {
+                    if (targetNode.style.display == 'none') {
+                        setTimeout(initIframeListeners, 100);
+                    }
+                });
+                observer.observe(targetNode, {attributes: true, childList: true});
+            }
+
+            const initIframeListeners = () => {
+
+                var iframes = document.querySelectorAll('[data-fieldtype="editor"] iframe');
+                if (iframes === null || !iframes.length) {
+                    return false;
+                }
+
+                iframes.forEach((iframe) => {
+                    iframe.contentDocument.addEventListener('click', function(e) {
+
+                        var currentFrame = e.target;
+                        iframes.forEach((frame) => {
+                            var frameElem = frame.contentDocument.querySelector(".insertatcaretactive");
+                            if (frameElem !== null) {
+                                frameElem.classList.remove("insertatcaretactive");
+                            }
+                        });
+
+                        var contentBody = currentFrame.querySelector('body');
+                        if (contentBody !== null) {
+                            contentBody.classList.add("insertatcaretactive");
+                        }
+                    });
+                });
+
+                return true;
+            };
+
+
             var clickforword = document.getElementsByClassName('clickforword');
             for (var i = 0; i < clickforword.length; i++) {
                 clickforword[i].addEventListener('click', function(e) {
                     e.preventDefault(); // To prevent the default behaviour of a tag.
-                    module.insertAtCaret("{" + this.getAttribute('data-text') + "}");
+
+                    var content = "{" + this.getAttribute('data-text') + "}";
+                    var iframes = document.querySelectorAll('[data-fieldtype="editor"] iframe');
+                    if (iframes === null || !iframes.length) {
+                        return false;
+                    }
+                    var tinyEditor;
+                    iframes.forEach((frame) => {
+                        var frameElem = frame.contentDocument.querySelector(".insertatcaretactive");
+                        if (frameElem !== null) {
+                            var contentBody = frame.contentDocument.querySelector('body');
+                            if (contentBody !== null) {
+                                contentBody.classList.add("insertatcaretactive");
+                                var id = contentBody.dataset.id;
+                                var editor = window.tinyMCE.get(id);
+                                tinyEditor = editor;
+                            }
+                        }
+                        return false;
+                    });
+
+                    if (tinyEditor) {
+                        tinyEditor.selection.setContent(content);
+                    } else {
+                        module.insertAtCaret(content);
+                    }
+
+                    return true;
                 });
             }
 
             // Make selected roles as badges in module edit form page.
-            if (document.getElementById('page-mod-pulse-mod')
+            if (document.getElementById('page-mod-pulse-mod') !== null && document.getElementById('page-mod-pulse-mod')
                 .querySelector("#fgroup_id_completionrequireapproval [data-fieldtype='autocomplete']") !== null) {
                 const textNodes = this.getAllTextNodes(
                     document.getElementById('page-mod-pulse-mod')
@@ -68,6 +160,17 @@ define([], function() {
             }
         },
 
+        insertCaretActive: function(EditorInput) {
+            if (EditorInput === null) {
+                return;
+            }
+            var caret = document.getElementsByClassName("insertatcaretactive");
+            for (var j = 0; j < caret.length; j++) {
+                caret[j].classList.remove("insertatcaretactive");
+            }
+            EditorInput.classList.add("insertatcaretactive");
+        },
+
         /**
          * Filter text from node.
          * @param  {string} element
@@ -76,6 +179,26 @@ define([], function() {
         getAllTextNodes: function(element) {
             return Array.from(element.childNodes)
             .filter(node => node.nodeType === 3 && node.textContent.trim().length > 1);
+        },
+
+        /**
+         * Find the selection is inside the editor
+         *
+         * @param {string} div
+         * @returns {bool}
+         */
+        isSelectionInsideDiv: (div) => {
+            const selection = window.getSelection();
+            if (selection.rangeCount === 0) {
+              return false;
+            }
+
+            // Get the start and end nodes of the selection.
+            const startNode = selection.getRangeAt(0).startContainer;
+            const endNode = selection.getRangeAt(0).endContainer;
+
+            // Check if the start and end nodes are both descendants of the editor div.
+            return div.contains(startNode) && div.contains(endNode);
         },
 
         /**
@@ -88,7 +211,7 @@ define([], function() {
             for (var n = 0; n < caretelements.length; n++) {
                 var thiselem = caretelements[n];
 
-                if (typeof thiselem.value === 'undefined' && window.getSelection) {
+                if (typeof thiselem.value === 'undefined' && window.getSelection && this.isSelectionInsideDiv(thiselem)) {
                     sel = window.getSelection();
                     if (sel.getRangeAt && sel.rangeCount) {
                         range = sel.getRangeAt(0);

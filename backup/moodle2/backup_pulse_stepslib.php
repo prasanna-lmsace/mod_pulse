@@ -22,10 +22,8 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die('No direct access !');
-
 /**
- * Define the complete pulse structure for backup, with file and id annotations
+ * Define the complete pulse structure for backup, with file and id annotations.
  */
 class backup_pulse_activity_structure_step extends backup_activity_structure_step {
 
@@ -39,7 +37,8 @@ class backup_pulse_activity_structure_step extends backup_activity_structure_ste
         // Define each element separated - table fields.
         $pulse = new backup_nested_element('pulse', array('id'), array(
             'course', 'name', 'intro', 'introformat', 'pulse_subject', 'pulse_content',
-            'pulse_contentformat', 'pulse', 'diff_pulse', 'resend_pulse',
+            'pulse_contentformat', 'pulse', 'diff_pulse', 'displaymode',
+            'boxtype', 'boxicon', 'cssclass', 'resend_pulse',
             'completionavailable', 'completionself', 'completionapproval',
             'completionapprovalroles', 'timemodified'));
 
@@ -78,7 +77,7 @@ class backup_pulse_activity_structure_step extends backup_activity_structure_ste
         $pulse->annotate_files('mod_pulse', 'intro', null);
         $pulse->annotate_files('mod_pulse', 'pulse_content', null);
 
-        $pulse = pulse_extend_backup_steps($pulse, $userinfo);
+        $pulse = \mod_pulse\extendpro::pulse_extend_backup_steps($pulse, $userinfo);
 
         // Return the root element (data), wrapped into standard activity structure.
         return $this->prepare_activity_structure($pulse);

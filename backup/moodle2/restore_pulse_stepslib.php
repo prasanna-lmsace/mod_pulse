@@ -22,8 +22,6 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die('No direct access!');
-
 /**
  * Define all the restore steps that will be used by the restore_pulse_activity_task
  */
@@ -43,7 +41,7 @@ class restore_pulse_activity_structure_step extends restore_activity_structure_s
         $paths[] = new restore_path_element('pulse_users', '/activity/pulse/notifiedusers/pulse_users');
         $paths[] = new restore_path_element('pulse_completion', '/activity/pulse/usercompletion/pulse_completion');
 
-        $methods = pulse_extend_restore_structure($paths);
+        $methods = \mod_pulse\extendpro::pulse_extend_restore_structure($paths);
         // Return the paths wrapped into standard activity structure.
         return $this->prepare_activity_structure($paths);
     }
@@ -131,6 +129,22 @@ class restore_pulse_activity_structure_step extends restore_activity_structure_s
         $data->userid = $this->get_mappingid('user', $data->userid);
         // Insert instance into Database.
         $newitemid = $DB->insert_record('local_pulsepro_availability', $data);
+    }
+
+    /**
+     * Process pro feattures user credits table restore methods.
+     * Pro feature.
+     * @param  mixed $data restore data.
+     * @return void
+     */
+    protected function process_local_pulsepro_credits($data) {
+        global $DB;
+        $data = (object) $data;
+        $oldid = $data->id;
+        $data->pulseid = $this->get_new_parentid('pulse');
+        $data->userid = $this->get_mappingid('user', $data->userid);
+        // Insert instance into Database.
+        $newitemid = $DB->insert_record('local_pulsepro_credits', $data);
     }
 
     /**

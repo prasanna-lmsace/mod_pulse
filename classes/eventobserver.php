@@ -24,8 +24,6 @@
 
 namespace mod_pulse;
 
-defined('MOODLE_INTERNAL') || die('No direct access !');
-
 /**
  * Observer class for the course module deleted and user enrolment deleted events. It will remove the user data from pulse.
  */
@@ -42,6 +40,7 @@ class eventobserver {
         global $CFG, $DB;
         if ($event->other['modulename'] == 'pulse') {
             $pulseid = $event->other['instanceid'];
+            $courseid = $event->courseid;
             // Remove pulse user completion records.
             if ($DB->record_exists('pulse_completion', ['pulseid' => $pulseid])) {
                 $DB->delete_records('pulse_completion', ['pulseid' => $pulseid]);
@@ -68,7 +67,7 @@ class eventobserver {
         $userid = $event->relateduserid; // Unenrolled user id.
         $courseid = $event->courseid;
         // Retrive list of pulse instance added in course.
-        $list = pulse_course_instancelist($courseid);
+        $list = \mod_pulse\helper::course_instancelist($courseid);
         if (!empty($list)) {
             $pulselist = array_column($list, 'instance');
             list($insql, $inparams) = $DB->get_in_or_equal($pulselist);
@@ -78,6 +77,45 @@ class eventobserver {
             $DB->delete_records_select('pulse_completion', $select, $inparams);
             $DB->delete_records_select('pulse_users', $select, $inparams);
         }
+
+        self::trigger_action_event('user_enrolment_deleted', $event);
+
         return true;
+    }
+
+    /**
+     * User enrolment trigger actions.
+     *
+     * @param [type] $event
+     * @return void
+     */
+    public static function user_enrolment_created($event) {
+        $userid = $event->relateduserid; // Unenrolled user id.
+        $courseid = $event->courseid;
+
+        $list = \mod_pulse\automation\helper::get_course_instances($courseid);
+        if (!empty($list)) {
+            foreach ($list as $instanceid => $instance) {
+                \mod_pulse\automation\instances::create($instanceid)->trigger_action($userid, null, true);
+            }
+        }
+    }
+
+    /**
+     * Trigger an action event for all instances in a course.
+     *
+     * @param string $method The method to trigger.
+     * @param stdClass $event The event object.
+     */
+    public static function trigger_action_event($method, $event) {
+
+        $courseid = $event->courseid;
+
+        $list = \mod_pulse\automation\helper::get_course_instances($courseid);
+        if (!empty($list)) {
+            foreach ($list as $instanceid => $instance) {
+                \mod_pulse\automation\instances::create($instanceid)->trigger_action_event($method, $event);
+            }
+        }
     }
 }
