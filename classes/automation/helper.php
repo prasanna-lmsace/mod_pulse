@@ -387,7 +387,6 @@ class helper {
         foreach ($actions as $component => $action) {
             if (method_exists($action, 'display_instance_warnings')) {
                 $messages += $action->display_instance_warnings($course);
-                // $messages = array_merge($messages, $message);
             }
         }
 
