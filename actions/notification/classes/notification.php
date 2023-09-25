@@ -926,6 +926,7 @@ class notification {
     public static function get_schedule_subject($value, $row) {
         global $DB;
 
+        $value = $row->instancesubject ?: $row->templatesubject; // Use templates subject if instance subject doesn't overrides.
         $sender = \core_user::get_support_user();
         $courseid = $DB->get_field('pulse_autoinstances', 'courseid', ['id' => $row->instanceid]);
         $user = (object) \core_user::get_user($row->userid);

@@ -138,8 +138,12 @@ class notification extends base {
             $this->get_entity_name()
         ))
         ->set_is_sortable(true)
-        ->add_field("IF ({$templatesalias}.title <> '', {$templatesalias}.title, {$templatesinsalias}.title)", 'title')
-        ->add_callback(fn($val, $row) => format_string($val));
+        ->add_field("{$templatesalias}.title", 'templatetitle')
+        ->add_field("{$templatesinsalias}.title", 'institle')
+        ->add_callback(function($val, $row) {
+            $val = $row->institle ?: $row->templatetitle;
+            return format_string($val);
+        });
 
         // Subject field.
         $columns[] = (new column(
@@ -148,8 +152,8 @@ class notification extends base {
             $this->get_entity_name()
         ))
         ->set_is_sortable(true)
-        ->add_field("IF ({$notificationinsalias}.subject <> '',
-            {$notificationinsalias}.subject, {$notificationalias}.subject)", "subject")
+        ->add_field("{$notificationinsalias}.subject", "instancesubject")
+        ->add_field("{$notificationalias}.subject", "templatesubject")
         ->add_field("{$templatesinsalias}.instanceid")
         ->add_field("{$notificationschalias}.userid")
         ->add_callback([pulsenotification::class, 'get_schedule_subject']);

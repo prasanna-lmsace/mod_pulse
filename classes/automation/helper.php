@@ -374,4 +374,21 @@ class helper {
         return \html_writer::tag('div', $html, ['class' => 'automation-instruction']);
     }
 
+    /**
+     * Display the warning messages of actions for this course, If this instance is not ready to preform the actions.
+     *
+     * @param stdclass $course
+     * @return void
+     */
+    public static function display_actions_course_warnings($course) {
+        $actions = self::get_actions();
+
+        $messages = [];
+        foreach ($actions as $component => $action) {
+            if (method_exists($action, 'display_instance_warnings')) {
+                $messages += $action->display_instance_warnings($course);
+            }
+        }
+    }
+
 }

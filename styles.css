@@ -203,7 +203,7 @@
     border-collapse: collapse;
     vertical-align: middle;
 }
-.mod-pulse-automation-table table.generaltable tbody td:not([colspan]):first-child {
+.mod-pulse-automation-table div:not(.automation-instruction) > div > table.generaltable tbody td:not([colspan]):first-child {
     border-left: 1px solid #eee;
     border-top-left-radius: 5px;
     border-bottom-left-radius: 5px;
@@ -280,13 +280,13 @@
 .mod-pulse-automation-table table.generaltable tbody td .badge.pulseaction_notification {
     background-color: #7b61ff;
 }
-.path-admin-mod-pulse-automation-templates .box.generalbox {
+.mod-pulse-automation-table .box.generalbox {
     position: relative;
 }
-.path-admin-mod-pulse-automation-templates .filter-form-container {
+.mod-pulse-automation-table .filter-form-container {
     float: right;
 }
-.path-admin-mod-pulse-automation-templates .filter-form-container #pulse-automation-filter i.icon {
+.mod-pulse-automation-table .filter-form-container #pulse-automation-filter i.icon {
     margin-right: 0;
 }
 .mod-pulse-automation-table .filter-form-container #pulse-automation-filterform {

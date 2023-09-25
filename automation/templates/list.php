@@ -27,6 +27,9 @@ use mod_pulse\automation\helper;
 // Require config.
 require(__DIR__.'/../../../../config.php');
 
+// Login check after config inlcusion.
+require_login();
+
 // Require admin library.
 require_once($CFG->libdir.'/adminlib.php');
 

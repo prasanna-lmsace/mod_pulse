@@ -23,6 +23,7 @@
  */
 
 use mod_pulse\automation\condition_base;
+use mod_pulse\automation\helper;
 
 // Require config.
 require(__DIR__.'/../../../../config.php');
@@ -147,6 +148,8 @@ echo $OUTPUT->header();
 // Template heading.
 echo $OUTPUT->heading(get_string('editinstance', 'pulse'));
 
+// Course action warning messages.
+echo helper::display_actions_course_warnings($course);
 // Display the template form for create or edit.
 echo $templatesform->display();
 
