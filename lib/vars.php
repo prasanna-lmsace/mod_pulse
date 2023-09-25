@@ -358,7 +358,7 @@ class pulse_email_vars {
             $fields = array_merge(array_keys($userfields), array_values($profilefields));
 
             array_walk($fields, function(&$value) {
-                $value = 'User_'.$value;
+                $value = 'User_'.ucwords($value);
             });
 
             $fields = array_values($fields);
@@ -403,7 +403,7 @@ class pulse_email_vars {
             $fields = array_merge($coursefields, array_values($customfields));
 
             array_walk($fields, function(&$value) {
-                $value = 'Course_'.$value;
+                $value = 'Course_'.ucwords($value);
             });
 
             $fields = array_values($fields);

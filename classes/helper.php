@@ -85,12 +85,12 @@ class helper {
             if (stripos($templatetext, $replacement) !== false) {
                 $val = $vars->$funcname;
                 // Placeholder found on the text, then replace with data.
-                $templatetext = str_replace($replacement, $val, $templatetext);
+                $templatetext = str_ireplace($replacement, $val, $templatetext);
             }
             // Replace message subject placeholder.
             if (stripos($subject, $replacement) !== false) {
                 $val = $vars->$funcname;
-                $subject = str_replace($replacement, $val, $subject);
+                $subject = str_ireplace($replacement, $val, $subject);
             }
         }
         return [$subject, $templatetext];
@@ -107,16 +107,16 @@ class helper {
         }
         // Update the timestamp to user readable time.
         array_walk($var, function(&$value, $key) {
-            if (in_array($key, ['timecreated', 'timemodified', 'startdate', 'enddate', 'firstaccess',
+            if (in_array(strtolower($key), ['timecreated', 'timemodified', 'startdate', 'enddate', 'firstaccess',
                 'lastaccess', 'lastlogin', 'currentlogin', 'timecreated', 'starttime', 'endtime'])) {
                 $value = userdate($value);
             }
             // Update the status to user readable strings.
-            if (in_array($key, ['visible', 'groupmode', 'groupmodeforce', 'defaultgroupingid', 'enablecompletion'])) {
+            if (in_array(strtolower($key), ['visible', 'groupmode', 'groupmodeforce', 'defaultgroupingid', 'enablecompletion'])) {
                 $value = $value == 1 ? get_string('enabled', 'pulse') : get_string('disabled', 'pulse');
             }
 
-            if ($key == 'lang') {
+            if (strtolower($key) == 'lang') {
                 // Get the list of translations.
                 $translations = get_string_manager()->get_list_of_translations();
                 $value = $translations[$value] ?? '';
