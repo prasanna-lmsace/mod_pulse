@@ -191,13 +191,8 @@ class notification {
     /**
      * Create the instance of the notification controller.
      *
-<<<<<<< .mine
-     * @param [type] $notificationid Notification instance record id NOT autoinstanceid or notificationid.
-     * @return self
-=======
-     * @param int $notificationid Notification instance record id NOT autoinstanceid.
+     * @param int $notificationid Notification instance record id (pulseaction_notification_ins) NOT autoinstanceid.
      * @return notification
->>>>>>> .theirs
      */
     public static function instance($notificationid) {
         static $instance;
@@ -227,7 +222,7 @@ class notification {
         global $DB;
 
         $notification = $DB->get_record('pulseaction_notification_ins', ['id' => $this->notificationid]);
-        
+
         if (empty($notification)) {
             throw new \moodle_exception('notificationinstancenotfound', 'pulse');
         }
