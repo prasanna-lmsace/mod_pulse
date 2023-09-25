@@ -111,7 +111,7 @@ class helper {
         array_walk($var, function(&$value, $key) {
             if (in_array(strtolower($key), ['timecreated', 'timemodified', 'startdate', 'enddate', 'firstaccess',
                 'lastaccess', 'lastlogin', 'currentlogin', 'timecreated', 'starttime', 'endtime'])) {
-                $value = userdate($value);
+                $value = $value ? userdate($value) : '';
             }
             // Update the status to user readable strings.
             if (in_array(strtolower($key), ['visible', 'groupmode', 'groupmodeforce', 'defaultgroupingid', 'enablecompletion'])) {

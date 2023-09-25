@@ -38,16 +38,17 @@ $instance = optional_param('instance', false, PARAM_BOOL);
 // Page values.
 $context = \context_system::instance();
 
-admin_externalpage_setup('pulseautomation');
+if (is_siteadmin()) {
+    // Setup breadcrumps.
+    admin_externalpage_setup('pulseautomation');
+}
 
 // Verify the user capability.
-require_capability('mod/pulse:addtemplate', $context);
+require_capability('mod/pulse:viewtemplateslist', $context);
 
 // Prepare the page.
 $PAGE->set_context($context);
 $PAGE->set_url(new moodle_url('/mod/pulse/automation/templates/list.php'));
-
-// TODO: Capability checks.
 
 // Process actions.
 if ($action !== null && confirm_sesskey()) {
@@ -101,6 +102,14 @@ $PAGE->add_body_class('mod-pulse-automation-table');
 // Further prepare the page.
 $PAGE->set_heading(get_string('autotemplates', 'pulse'));
 
+// Add breadcrumbs for the non admin users, has the capability to view templates.
+if (!is_siteadmin()) {
+    // PAGE breadcrumbs.
+    $PAGE->navbar->add(get_string('profile', 'core'), new moodle_url('/user/profile.php'));
+    $PAGE->navbar->add(get_string('autotemplates', 'pulse'), new moodle_url('/mod/pulse/automation/templates/list.php'));
+    $PAGE->navbar->add(get_string('list'));
+}
+
 // Build automation templates table.
 $filterset = new mod_pulse\table\automation_filterset;
 
@@ -118,7 +127,10 @@ $table->set_filterset($filterset);
 
 // Start page output.
 echo $OUTPUT->header();
-echo $OUTPUT->heading(get_string('autotemplates', 'pulse'));
+// Display the heading only for admin users.
+if (is_siteadmin()) {
+    echo $OUTPUT->heading(get_string('autotemplates', 'pulse'));
+}
 
 // Show templates description.
 echo get_string('autotemplates_desc', 'pulse');

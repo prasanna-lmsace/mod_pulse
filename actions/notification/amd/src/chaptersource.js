@@ -48,7 +48,7 @@ define(['jquery', 'core/ajax', 'core/notification', 'core/modal_factory', 'core/
         }
 
         var dynamicparams = {};
-        var formData;
+
         if (document.querySelector('[name=pulsenotification_dynamiccontent]') !== null) {
             dynamicparams = {
                 contentdynamic: document.querySelector('[name=pulsenotification_dynamiccontent]').value,
@@ -56,15 +56,16 @@ define(['jquery', 'core/ajax', 'core/notification', 'core/modal_factory', 'core/
                 chapterid: document.querySelector('[name=pulsenotification_chapterid]').value,
                 contentlength: document.querySelector('[name=pulsenotification_contentlength]').value,
             };
-
-            // Get the form data.
-            var form = document.forms['pulse-automation-template'];
-            var formdata = new FormData(form);
-            formdata = new URLSearchParams(formdata).toString();
-            formData = {
-                formdata: formdata
-            };
         }
+        // Get the form data.
+        var formData;
+        var form = document.forms['pulse-automation-template'];
+        var formdata = new FormData(form);
+        formdata = new URLSearchParams(formdata).toString();
+        formData = {
+            formdata: formdata
+        };
+
         var finalParams = {...params, ...dynamicparams, ...formData};
 
         return Fragment.loadFragment('pulseaction_notification', 'preview_content', contextID, finalParams);

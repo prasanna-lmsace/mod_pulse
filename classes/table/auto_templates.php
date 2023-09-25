@@ -209,21 +209,18 @@ class auto_templates extends table_sql {
     public function edit_switch($row) {
         global $PAGE, $OUTPUT;
 
-        if ($PAGE->user_allowed_editing()) {
-
-            $temp = (object) [
-                'legacyseturl' => (new moodle_url('/mod/pulse/automation/templates/list.php', [
-                    'id' => $row->id,
-                    'sesskey' => sesskey()
-                    ]))->out(false),
-                'pagecontextid' => $PAGE->context->id,
-                'pageurl' => $PAGE->url,
-                'sesskey' => sesskey(),
-                'checked' => $row->status,
-                'id' => $row->id
-            ];
-            return $OUTPUT->render_from_template('pulse/status_switch', $temp);
-        }
+        $temp = (object) [
+            'legacyseturl' => (new moodle_url('/mod/pulse/automation/templates/list.php', [
+                'id' => $row->id,
+                'sesskey' => sesskey()
+                ]))->out(false),
+            'pagecontextid' => $PAGE->context->id,
+            'pageurl' => $PAGE->url,
+            'sesskey' => sesskey(),
+            'checked' => $row->status,
+            'id' => $row->id
+        ];
+        return $OUTPUT->render_from_template('pulse/status_switch', $temp);
     }
 
     /**

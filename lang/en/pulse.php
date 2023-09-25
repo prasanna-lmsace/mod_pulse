@@ -259,7 +259,7 @@ $string['enrolmentemptyenddate'] = '-';
 $string['pulse:addtemplate'] = 'Add a new automation template';
 $string['pulse:viewtemplateslist'] = 'View the automation templates list';
 $string['pulse:addtemplateinstance'] = 'Add a new template instance';
-$string['mod/pulse:sender'] = 'Notification sender user';
+$string['pulse:sender'] = 'Notification sender user';
 
 // ...Templates list string.
 $string['autotemplates'] = 'Automation templates';
@@ -367,3 +367,6 @@ $string['automationinstance_help5'] = 'Click on this icon to edit the automation
 $string['automationinstance_help6'] = 'Duplicate the automation';
 $string['automationinstance_help7'] = 'Open the automation queue (in the report builder), which provides information about all the automations that ran.';
 $string['automationinstance_help8'] = 'Use this toggle to turn on or off the automation instance locally. This will override the status of the template, i.e. even if the template is turned off, it can be enabled.';
+
+// Pulse automation template profile navigation link.
+$string['pulsetemplink'] = "Pulse Automation Template";

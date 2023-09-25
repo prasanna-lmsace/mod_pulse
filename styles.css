@@ -203,7 +203,7 @@
     border-collapse: collapse;
     vertical-align: middle;
 }
-.mod-pulse-automation-table table.generaltable tbody td:first-child {
+.mod-pulse-automation-table table.generaltable tbody td:not([colspan]):first-child {
     border-left: 1px solid #eee;
     border-top-left-radius: 5px;
     border-bottom-left-radius: 5px;
@@ -289,7 +289,7 @@
 .path-admin-mod-pulse-automation-templates .filter-form-container #pulse-automation-filter i.icon {
     margin-right: 0;
 }
-.path-admin-mod-pulse-automation-templates .filter-form-container #pulse-automation-filterform {
+.mod-pulse-automation-table .filter-form-container #pulse-automation-filterform {
     background-color: #fff;
     border: 1px solid #ccc;
     box-shadow: 0 0 0 0.1px;
@@ -299,10 +299,10 @@
     right: 0;
     z-index: 2;
 }
-.path-admin-mod-pulse-automation-templates .filter-form-container #pulse-automation-filterform form .form-group {
+.mod-pulse-automation-table .filter-form-container #pulse-automation-filterform form .form-group {
     margin-left: 0;
 }
-.path-admin-mod-pulse-automation-templates .filter-form-container #pulse-automation-filterform form .form-group .col-form-label {
+.mod-pulse-automation-table .filter-form-container #pulse-automation-filterform form .form-group .col-form-label {
     padding-left: 0;
 }
 

@@ -121,11 +121,12 @@ function pulseaction_notification_output_fragment_preview_instance_content($args
 function pulseaction_notification_output_fragment_preview_content($args) {
     global $OUTPUT;
 
-    $coursecontext = $args['context'];
-
     if (isset($args['contentheader'])) {
-        $courseid = $args['courseid'] ?? $coursecontext->instanceid;
-        $course = get_course($courseid ?: SITEID);
+
+        parse_str($args['formdata'], $formdata);
+        $courseid = $formdata['courseid'] ?? SITEID;
+        $course = get_course($courseid);
+        $coursecontext = context_course::instance($courseid);
 
         // Get the enrolled users for this course.
         $users = get_enrolled_users($coursecontext);
@@ -165,7 +166,7 @@ function pulseaction_notification_output_fragment_preview_content($args) {
                 $mod = current($modules[$modname]);
             }
             // Check the session condition are set for this notification. if its added then load the session data for placeholders.
-            parse_str($args['formdata'], $formdata);
+
             $sessionincondition = in_array('session', (array) array_keys($formdata['condition']));
             if ($sessionincondition && $formdata['condition']['session']['status']) {
                 $sessionconditiondata = (object) ['modules' => $formdata['condition']['session']['modules']];

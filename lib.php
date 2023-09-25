@@ -21,6 +21,7 @@
  * @copyright 2021, bdecent gmbh bdecent.de
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+use core_user\output\myprofile\tree;
 
 defined( 'MOODLE_INTERNAL') || die(' No direct access ');
 
@@ -666,5 +667,40 @@ function mod_pulse_extend_navigation_course(navigation_node $navigation, stdClas
         $node->key = 'automation-templates';
         $navigation->add_node($node, 'gradebooksetup');
         $PAGE->requires->js_call_amd('mod_pulse/automation', 'instanceMenuLink', []);
+    }
+}
+
+/**
+ * Defines pulse automation template list nodes for my profile navigation tree.
+ *
+ * @param \core_user\output\myprofile\tree $tree Tree object
+ * @param stdClass $user user object
+ * @param bool $iscurrentuser is the user viewing profile, current user ?
+ * @param stdClass $course course object
+ *
+ * @return bool
+ */
+function mod_pulse_myprofile_navigation(tree $tree, $user, $iscurrentuser, $course) {
+    global $USER;
+
+    // Get the pulse category.
+    if (!array_key_exists('pulse', $tree->__get('categories'))) {
+        // Create the category.
+        $categoryname = get_string('pluginname', 'mod_pulse');
+        $category = new core_user\output\myprofile\category('pulse', $categoryname, 'privacyandpolicies');
+        $tree->add_category($category);
+    } else {
+        // Get the existing category.
+        $category = $tree->__get('categories')['pulse'];
+    }
+
+    if ($iscurrentuser) {
+        $systemcontext = \context_system::instance();
+        if (has_capability('mod/pulse:viewtemplateslist', $systemcontext)) {
+            $automationtemplate = new moodle_url('/mod/pulse/automation/templates/list.php');
+            $pulsenode = new core_user\output\myprofile\node('pulse', 'pulse',
+                get_string('pulsetemplink', 'mod_pulse'), null, $automationtemplate);
+            $tree->add_node($pulsenode);
+        }
     }
 }
