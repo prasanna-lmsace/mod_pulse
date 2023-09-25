@@ -70,7 +70,7 @@ Feature: Pulse automation templates
     Then I press "Save changes"
     Then I should see "Template updated successfully"
     And I should see "Triggers" in the "#pulse_automation_template tbody tr:nth-child(1)" "css_element"
-    And I should see "Condition triggers" in the "#pulse_automation_template tbody tr:nth-child(1) .template-reference" "css_element"
+    And I should see "Conditiontriggers" in the "#pulse_automation_template tbody tr:nth-child(1) .template-reference" "css_element"
 
   @javascript
   Scenario: Check Visibility of automation template
