@@ -387,8 +387,12 @@ class helper {
         foreach ($actions as $component => $action) {
             if (method_exists($action, 'display_instance_warnings')) {
                 $messages += $action->display_instance_warnings($course);
+                // $messages = array_merge($messages, $message);
             }
         }
+
+        $ul = \html_writer::tag('ul', implode('', array_map(fn($val) => '<li>' . $val . '</li>', array_filter($messages))));
+        echo \html_writer::div($ul, 'pulse-warnings text-warning');
     }
 
 }

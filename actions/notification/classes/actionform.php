@@ -315,6 +315,37 @@ class actionform extends \mod_pulse\automation\action_base {
     }
 
     /**
+     * Generate the warnings if the instance is not compatibile to send notifications.
+     *
+     * @param \stdclass $course
+     * @return array
+     */
+    public function display_instance_warnings(\stdclass $course): array {
+
+        // Course visibility warnings.
+        if (!$course->visible) {
+            $warning[] = get_string('coursehidden', 'pulseaction_notification');
+        }
+
+        // Course active users warnings.
+        $coursecontext = \context_course::instance($course->id);
+        if (!count_enrolled_users($coursecontext, '', null, true)) {
+            $warning[] = get_string('noactiveusers', 'pulseaction_notification');
+        }
+
+        // Course is not started.
+        if ($course->startdate > time()) {
+            $warning[] = get_string('coursenotstarted', 'pulseaction_notification');
+        }
+
+        // Course is not started.
+        if ($course->enddate && $course->enddate < time()) {
+            $warning[] = get_string('courseenddatereached', 'pulseaction_notification');
+        }
+
+        return $warning ?? [];
+    }
+    /**
      * Save the template config.
      *
      * @param stdclass $record

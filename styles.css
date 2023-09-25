@@ -343,3 +343,7 @@
 .path-mod-pulse-automation #fitem_id_insreference #pulse-template-reference {
     margin-right: 10px;
 }
+/* Warning message info */
+#page-mod-pulse-automation-instances-edit .pulse-warnings li span {
+    color: initial;
+}

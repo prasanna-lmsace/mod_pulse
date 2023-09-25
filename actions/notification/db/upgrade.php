@@ -35,22 +35,20 @@ function xmldb_pulseaction_notification_upgrade($oldversion) {
 
     $dbman = $DB->get_manager();
 
-    if ($oldversion < 2023080409) {
-        // Auto templates instance.
-        $instable = new xmldb_table('pulseaction_notification');
-        $timemodified = new xmldb_field('timemodified', XMLDB_TYPE_INTEGER, '11', null, null, null, null);
-        // Verify field exists.
-        if ($dbman->field_exists($instable, $timemodified)) {
-            // Change the field.
-            $dbman->change_field_precision($instable, $timemodified);
-        }
+    // Auto templates instance.
+    $instable = new xmldb_table('pulseaction_notification');
+    $timemodified = new xmldb_field('timemodified', XMLDB_TYPE_INTEGER, '11', null, null, null, null);
+    // Verify field exists.
+    if ($dbman->field_exists($instable, $timemodified)) {
+        // Change the field.
+        $dbman->change_field_precision($instable, $timemodified);
+    }
 
-        // Update the templates table timemodified.
-        $temptable = new xmldb_table('pulseaction_notification_ins');
-        if ($dbman->field_exists($temptable, $timemodified)) {
-            // Change the field.
-            $dbman->change_field_precision($temptable, $timemodified);
-        }
+    // Update the templates table timemodified.
+    $temptable = new xmldb_table('pulseaction_notification_ins');
+    if ($dbman->field_exists($temptable, $timemodified)) {
+        // Change the field.
+        $dbman->change_field_precision($temptable, $timemodified);
     }
 
     return true;

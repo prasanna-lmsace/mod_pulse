@@ -137,3 +137,8 @@ $string['contentlength_help'] = ' Choose the content length to include in the no
 // Chapters.
 $string['chapters'] = 'Chapters';
 $string['chapters_help'] = 'Provides support to select specific chapters from a Book activity.';
+// ...Course instance warning messages.
+$string['coursehidden'] = 'Course is hidden from the students. <span> Please enable the visibility of the course to send notifications.</span>';
+$string['noactiveusers'] = 'Course doesn\'t contain any active enrolments. <span> Please enroll users in the course.</span>';
+$string['coursenotstarted'] = 'Course has not started. <span> Please set the course start date to a date in the past.</span>';
+$string['courseenddatereached'] = 'Course has ended. <span> Please set the course end date to a date in the future or remove the end date.</span>';
