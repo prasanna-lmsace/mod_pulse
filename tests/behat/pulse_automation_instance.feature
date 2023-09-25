@@ -96,23 +96,6 @@ Feature: Pulse automation instances
     And I should see "WELCOME MESSAGE" in the "#pulse_automation_template tbody tr:nth-child(2)" "css_element"
 
   @javascript
-  Scenario: View the report the automation template instance.
-    Given I log in as "admin"
-    Then I create automation template with the following fields to these values:
-      | Title     | WELCOME MESSAGE |
-      | Reference | Welcomemessage  |
-      | Visibility| Show            |
-    And I am on "Course 1" course homepage
-    And I follow "Automation"
-    Then I click on "Add automation instance" "button"
-    And I set the following fields to these values:
-      | insreference | Welcomemessage   |
-    And I press "Save changes"
-    And I should see "WELCOME MESSAGE" in the "#pulse_automation_template tbody tr:nth-child(1)" "css_element"
-    Then I click on "#pulse_automation_template tbody tr:nth-child(1) .action-report" "css_element"
-    Then ".reportbuilder-report" "css_element" should exist
-
-  @javascript
   Scenario: Delete the automation template instance.
     Given I log in as "admin"
     Then I create automation template with the following fields to these values:

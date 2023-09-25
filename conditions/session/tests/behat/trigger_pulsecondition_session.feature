@@ -28,7 +28,7 @@ Feature: Session trigger event.
     Then "FaceFace 01" activity should be visible
     And I press "Add an activity or resource"
     And I click on "Add a new Face-to-Face" "link" in the "Add an activity or resource" "dialogue"
-    And I set the field "Name" to "FaceFace 01"
+    And I set the field "Name" to "FaceFace 02"
     And I press "Save and return to course"
     Then "FaceFace 02" activity should be visible
     Then I create automation template with the following fields to these values:

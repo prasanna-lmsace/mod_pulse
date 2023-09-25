@@ -215,7 +215,6 @@ Feature: Pulse automation templates
     Then I create "Welcomemessage" template with the set the notification:
         | Sender      |  Group teacher    |
         | Interval    |  Once            |
-        | Limit of the notifications | 5 |
         | Cc          |  Teacher         |
         | Bcc         |  Manager         |
         | Subject     |  Demo MESSAGE    |
@@ -227,10 +226,8 @@ Feature: Pulse automation templates
     Then I press "Add automation instance"
     Then I click on "#automation-tabs .nav-item:nth-child(3) a" "css_element"
     Then I wait "10" seconds
-    Then the field "Sender" matches value "Groupteacher"
+    Then the field "Sender" matches value "Group teacher"
     Then the field "Interval" matches value "Once"
-    #Then the field "Cc" matches value "Teacher"
-    #Then the field "Bcc" matches value "Manager"
     Then the field "Subject" matches value "Demo MESSAGE"
 
   @javascript

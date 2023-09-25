@@ -36,6 +36,7 @@ Feature: Configuring the pulseaction_notification plugin on the "Automation temp
     And I should see "WELCOMEMESSAGE_COURSE_1" in the "pulse_automation_template" "table"
     And I click on ".action-report" "css_element" in the "WELCOMEMESSAGE_COURSE_1" "table_row"
     And I switch to a second window
+    Then ".reportbuilder-report" "css_element" should exist
     And the following should exist in the "reportbuilder-table" table:
     | Full name       | Subject                              | Status |
     | student User 1  | Welcome to Acceptance test site      | Queued |
