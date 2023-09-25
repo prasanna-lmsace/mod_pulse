@@ -191,8 +191,13 @@ class notification {
     /**
      * Create the instance of the notification controller.
      *
+<<<<<<< .mine
+     * @param [type] $notificationid Notification instance record id NOT autoinstanceid or notificationid.
+     * @return self
+=======
      * @param int $notificationid Notification instance record id NOT autoinstanceid.
      * @return notification
+>>>>>>> .theirs
      */
     public static function instance($notificationid) {
         static $instance;
@@ -222,7 +227,10 @@ class notification {
         global $DB;
 
         $notification = $DB->get_record('pulseaction_notification_ins', ['id' => $this->notificationid]);
-
+        
+        if (empty($notification)) {
+            throw new \moodle_exception('notificationinstancenotfound', 'pulse');
+        }
         $instance = instances::create($notification->instanceid);
         $autoinstance = $instance->get_instance_data();
 
@@ -459,6 +467,8 @@ class notification {
      */
     public function recreate_schedule_forinstance() {
         // Remove the current queued schedules.
+        $this->create_instance_data();
+
         $this->remove_schedules(self::STATUS_QUEUED);
         // Create the schedules for all users.
         $this->create_schedule_forinstance();

@@ -124,7 +124,8 @@ function pulseaction_notification_output_fragment_preview_content($args) {
     $coursecontext = $args['context'];
 
     if (isset($args['contentheader'])) {
-        $course = get_course($args['courseid'] ?? $coursecontext->instanceid);
+        $courseid = $args['courseid'] ?? $coursecontext->instanceid;
+        $course = get_course($courseid ?: SITEID);
 
         // Get the enrolled users for this course.
         $users = get_enrolled_users($coursecontext);

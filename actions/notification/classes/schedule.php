@@ -309,7 +309,7 @@ class schedule {
                 AND (ej1_ue.timeend = 0 OR ej1_ue.timeend > :timeend)
                 GROUP BY eu1_u.id, ej1_e.courseid
             ) AS active_enrols ON active_enrols.id = ue.id AND active_enrols.courseid = c.id
-            WHERE ns.status = :status AND an.status = 1
+            WHERE ns.status = :status
             AND active_enrols.activeenrolment <> 0
             AND c.visible = 1
             AND c.startdate <= :startdate AND  (c.enddate = 0 OR c.enddate >= :enddate)

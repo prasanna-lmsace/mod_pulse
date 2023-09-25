@@ -521,7 +521,7 @@ class instances extends templates {
         ];
 
         // Check the isntance is already created. if created update the record otherwise create new instance.
-
+        $instancedata->timemodified = time();
         if (isset($formdata->instanceid) && $DB->record_exists('pulse_autoinstances', ['id' => $formdata->instanceid])) {
 
             $instancedata->id = $formdata->instanceid;
@@ -585,6 +585,7 @@ class instances extends templates {
 
         $tablename = 'pulse_autotemplates_ins'; // Template instance tablename to update.
         // Update the instance overridden data related to template.
+        $templatedata['timemodified'] = time();
         \mod_pulse\automation\templates::update_instance_data($instanceid, $templatedata);
 
         // ...Send the data to action plugins for perform the data store.

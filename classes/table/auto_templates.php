@@ -48,8 +48,8 @@ class auto_templates extends table_sql {
     public function out($pagesize, $useinitialsbar, $downloadhelpbutton = '') {
 
         // Define table headers and columns.
-        $columns = ['title', 'templateaction', 'reference', 'actions'];
-        $headers = ["", "", "", ""];
+        $columns = ['title', 'reference', 'actions'];
+        $headers = ["", "", ""];
 
         $this->define_columns($columns);
         $this->define_headers($headers);

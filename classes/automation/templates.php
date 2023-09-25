@@ -380,6 +380,7 @@ class templates {
 
         // Create template record.
         $record->reference = shorten_text(strip_tags($record->reference), 30);
+        $record->timemodified = time();
         if (isset($formdata->id) && $DB->record_exists('pulse_autotemplates', ['id' => $formdata->id])) {
             $templateid = $formdata->id;
             // Update the template.
@@ -433,13 +434,10 @@ class templates {
         }
 
         if ($record = $DB->get_record('pulse_autotemplates_ins', ['instanceid' => $instanceid])) {
-
             $diff = array_diff_key((array) $record, $options);
             $removeoverrides = array_combine(array_keys($diff), array_fill(0, count($diff), null));
-
             $removeoverrides['id'] = $record->id;
             $removeoverrides['instanceid'] = $record->instanceid;
-            $removeoverrides['timemodified'] = date('Y-m-d H:i');
             $removeoverrides = array_merge($removeoverrides, $options);
 
             return $DB->update_record('pulse_autotemplates_ins', $removeoverrides);

@@ -308,8 +308,8 @@ class actionform extends \mod_pulse\automation\action_base {
         $instances = $this->get_template_instances($templateid);
 
         foreach ($instances as $instanceid => $instance) {
-            $notification = $DB->get_field('pulseaction_notification', 'id', ['instanceid' => $instanceid]);
-            notification::instance($notification->id)->recreate_schedule_forinstance();
+            $notification = $DB->get_field('pulseaction_notification_ins', 'id', ['instanceid' => $instanceid]);
+            notification::instance($notification)->recreate_schedule_forinstance();
         }
 
     }
