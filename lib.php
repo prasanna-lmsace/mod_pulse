@@ -428,8 +428,9 @@ function mod_pulse_cm_info_view(cm_info $cm) {
     $course = $cm->get_course();
     $senderdata = \mod_pulse\task\sendinvitation::get_sender($course->id, $cm->context->id);
     $sender = \mod_pulse\task\sendinvitation::find_user_sender($senderdata, $USER->id);
+    $user = clone $USER; // Prevent the cache issues.
     list($subject, $content) = \mod_pulse\helper::update_emailvars($content, '', $course,
-                            $USER, $pulse, $sender);
+                            $user, $pulse, $sender);
     $cm->set_content($content);
     if (isset($pulse->cssclass) && $pulse->cssclass) {
         $cm->set_extra_classes($pulse->cssclass);
