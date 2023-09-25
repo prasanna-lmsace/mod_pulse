@@ -65,6 +65,7 @@ class helper {
         }, array_keys((array) $newuser));
         $user->profilefield = (object) array_combine($newuserkeys, (array) $newuser);
 
+        $course = clone $course;
         // Load course custom profuile fields.
         $course->customfield = \core_course\customfield\course_handler::create()->export_instance_data_object($course->id);
 
