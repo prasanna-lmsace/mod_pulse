@@ -152,7 +152,7 @@ abstract class condition_base {
         // Remove empty values from data array.
         $filter = array_filter($data);
         // If 'status' is not set and there are no other non-empty values, stopped here.
-           if (!isset($data['status']) && empty($filter)) {
+        if (!isset($data['status']) && empty($filter)) {
             return true;
         }
 

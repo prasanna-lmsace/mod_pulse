@@ -5,18 +5,18 @@ Feature: Configuring the pulseaction_notification plugin on the "Automation temp
   I need to be able to configure the pulse automation template
 
   Background:
-  Given the following "categories" exist:
-      | name  | category | idnumber |
-      | Cat 1 | 0        | CAT1     |
-  And the following "course" exist:
-      | fullname    | shortname | category |
-      | Course 1    | C1        | 0        |
-  And the following "users" exist:
-      | username | firstname | lastname | email |
-      | student1 | student | User 1 | student1@test.com |
-  And the following "course enrolments" exist:
-      | user     | course | role |
-      | student1 | C1     | student |
+    Given the following "categories" exist:
+        | name  | category | idnumber |
+        | Cat 1 | 0        | CAT1     |
+    And the following "course" exist:
+        | fullname    | shortname | category |
+        | Course 1    | C1        | 0        |
+    And the following "users" exist:
+        | username | firstname | lastname | email |
+        | student1 | student | User 1 | student1@test.com |
+    And the following "course enrolments" exist:
+        | user     | course | role |
+        | student1 | C1     | student |
 
   @javascript
   Scenario: Create notification template and instance

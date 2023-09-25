@@ -170,4 +170,3 @@ Feature: Pulse automation instances
       | Title     | WELCOME CONTENT |
     And I press "Save changes"
     And I should see "WELCOME CONTENT"
-

@@ -452,6 +452,10 @@ class pulse_email_vars {
      */
     public static function session_fields() {
         global $CFG;
+        // Verify the face to face is installed. if not, prevent session placeholder inclusion.
+        if (!file_exists($CFG->dirroot.'/mod/facetoface/lib.php')) {
+            return [];
+        }
 
         require_once($CFG->dirroot.'/mod/facetoface/lib.php');
 

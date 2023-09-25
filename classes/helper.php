@@ -51,7 +51,10 @@ class helper {
      */
     public static function update_emailvars($templatetext, $subject, $course, $user, $mod, $sender) {
         global $DB, $CFG;
+
+        // Include placholders handler and user profile library.
         require_once($CFG->dirroot.'/mod/pulse/lib/vars.php');
+        require_once($CFG->dirroot.'/user/profile/lib.php');
 
         // Load user profile field data.
         $newuser = (object) ['id' => $user->id];
