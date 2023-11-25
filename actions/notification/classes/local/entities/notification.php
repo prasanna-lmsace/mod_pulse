@@ -131,6 +131,15 @@ class notification extends base {
             return userdate($value);
         });
 
+        // Instance id.
+        $columns[] = (new column(
+            'instanceid',
+            new lang_string('instanceid', 'pulseaction_notification'),
+            $this->get_entity_name()
+        ))
+        ->set_is_sortable(true)
+        ->add_field("{$notificationschalias}.instanceid");
+
         // Message type field.
         $columns[] = (new column(
             'messagetype',
@@ -205,16 +214,16 @@ class notification extends base {
         $filters[] = (new filter(
             text::class,
             'automationinstance',
-            new lang_string('messagetype', 'pulseaction_notification'),
+            new lang_string('automationinstance', 'pulseaction_notification'),
             $this->get_entity_name(),
-            "IF ({$templatesinsalias}.title <> '', {$templatesinsalias}.title, {$templatesalias}.title)"
+            "{$templatesinsalias}.title"
         ));
 
         // Automation template.
         $filters[] = (new filter(
             text::class,
             'automationtemplate',
-            new lang_string('messagetype', 'pulseaction_notification'),
+            new lang_string('automationtemplate', 'pulseaction_notification'),
             $this->get_entity_name(),
             "{$templatesalias}.title"
         ));
@@ -298,13 +307,13 @@ class notification extends base {
         $notificationalias = $this->get_table_alias('pulseaction_notification');
 
         return "
-            JOIN {pulse_autoinstances} AS {$autoinstancesalias} ON {$autoinstancesalias}.id = {$notificationschalias}.instanceid
-            JOIN {pulse_autotemplates} AS {$autotemplatesalias} ON {$autotemplatesalias}.id = {$autoinstancesalias}.templateid
-            JOIN {pulse_autotemplates_ins} AS {$autotemplatesinsalias}
+            JOIN {pulse_autoinstances} {$autoinstancesalias} ON {$autoinstancesalias}.id = {$notificationschalias}.instanceid
+            JOIN {pulse_autotemplates} {$autotemplatesalias} ON {$autotemplatesalias}.id = {$autoinstancesalias}.templateid
+            JOIN {pulse_autotemplates_ins} {$autotemplatesinsalias}
                 ON {$autotemplatesinsalias}.instanceid = {$autoinstancesalias}.id
-            JOIN {pulseaction_notification_ins} AS {$notificationinsalias}
+            JOIN {pulseaction_notification_ins} {$notificationinsalias}
                 ON {$notificationinsalias}.instanceid = {$notificationschalias}.instanceid
-            JOIN {pulseaction_notification} AS  {$notificationalias}
+            JOIN {pulseaction_notification} {$notificationalias}
                 ON {$notificationalias}.templateid = {$autoinstancesalias}.templateid";
     }
 }

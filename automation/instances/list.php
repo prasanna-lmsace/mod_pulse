@@ -116,7 +116,7 @@ $PAGE->add_body_class('mod-pulse-automation-table');
 $PAGE->set_heading(format_string($course->fullname));
 
 $PAGE->navbar->add(get_string('mycourses', 'core'), new moodle_url('/course/index.php'));
-$PAGE->navbar->add(format_string($course->shortname), new moodle_url('/admin/category.php', array('category' => 'mod_pulse')));
+$PAGE->navbar->add(format_string($course->shortname), new moodle_url('/course/view.php', ['id' => $course->id]));
 $PAGE->navbar->add(get_string('autotemplates', 'pulse'), new moodle_url('/mod/pulse/automation/instances/list.php'));
 
 // Build automation templates table.
@@ -131,7 +131,7 @@ echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('automation', 'pulse'));
 
 // Show smart menus description.
-echo get_string('autotemplates_desc', 'pulse');
+echo get_string('autoinstance_desc', 'pulse');
 
 // Prepare 'Create smart menu' button. // TODO Review.
 $createbutton = $OUTPUT->box_start();
@@ -190,7 +190,18 @@ if ($countmenus < 1) {
                 })
             });
         }
+
+        // Make the status toggle check and uncheck on click on status update toggle.
+        var form = document.querySelectorAll(".pulse-instance-status-switch");
+        form.forEach((switche) => {
+            switche.addEventListener("click", function(e) {
+                var form = e.currentTarget.querySelector("input[type=checkbox]");
+                form.click();
+            })
+        });
+
     })');
+
 }
 
 // Finish page output.

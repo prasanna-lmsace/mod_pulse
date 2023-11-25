@@ -69,7 +69,7 @@ class conditionform extends \mod_pulse\automation\condition_base {
         $list = [];
         $activities = get_all_instances_in_courses(static::MODNAME, [$courseid => $courseid]);
         array_map(function($value) use (&$list) {
-            $list[$value->id] = $value->name;
+            $list[$value->id] = format_string($value->name);
         }, $activities);
 
         $mform->addElement('autocomplete', 'condition[session][modules]',
@@ -133,7 +133,7 @@ class conditionform extends \mod_pulse\automation\condition_base {
         $completion = new \completion_info($course);
 
         // Get all the notification instance configures the suppress with this session.
-        $notifications = self::get_acitivty_notifications($cm->instance);
+        $notifications = self::get_session_notifications($cm->instance);
 
         foreach ($notifications as $notification) {
             // Get the notification suppres module ids.
@@ -145,8 +145,9 @@ class conditionform extends \mod_pulse\automation\condition_base {
                 // Trigger all the instance for notifications.
                 $condition->trigger_instance($notification->instanceid, $userid, $session->timestart);
             }
-            return true;
         }
+
+        return true;
     }
 
     /**
@@ -157,14 +158,21 @@ class conditionform extends \mod_pulse\automation\condition_base {
      * @param int $id ID of the triggered method, Role or cohort id.
      * @return array
      */
-    public static function get_acitivty_notifications($id) {
+    public static function get_session_notifications($id) {
         global $DB;
 
-        $like = $DB->sql_like('additional', ':value');
-        $sessionlike = $DB->sql_like('triggercondition', ':session');
-        $sql = "SELECT * FROM {pulse_condition_overrides} WHERE status >= 1 AND $sessionlike AND $like";
-        $params = ['session' => 'session', 'value' => '%"'.$id.'"%'];
+        $like = $DB->sql_like('co.additional', ':value'); // Like query to fetch the instances assigned this module.
+        $sessionlike = $DB->sql_like('pat.triggerconditions', ':session');
+
+        $sql = "SELECT *, ai.id as id, ai.id as instanceid FROM {pulse_autoinstances} ai
+        JOIN {pulse_autotemplates} pat ON pat.id = ai.templateid
+        LEFT JOIN {pulse_condition_overrides} co ON co.instanceid = ai.id AND co.triggercondition = 'session'
+        WHERE $like AND (co.status > 0 OR $sessionlike)";
+        // Params.
+        $params = ['session' => '%"session"%', 'value' => '%"'.$id.'"%'];
+
         $records = $DB->get_records_sql($sql, $params);
+
         return $records;
     }
 
@@ -178,7 +186,8 @@ class conditionform extends \mod_pulse\automation\condition_base {
     public static function get_session_time($notification, $instancedata) {
         global $DB;
 
-        if (isset($instancedata->condition['session']) && $instancedata->condition['session']['status']) {
+        if (isset($instancedata->condition['session']) && $instancedata->condition['session']['status']
+            && isset($instancedata->condition['session']['modules'])) {
             $module = $instancedata->condition['session']['modules'];
             $existingsignup = self::get_session_data($module, $notification->userid);
             return !empty($existingsignup) ? current($existingsignup)->timestart : '';

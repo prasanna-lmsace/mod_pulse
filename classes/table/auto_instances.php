@@ -31,6 +31,8 @@ require_once($CFG->dirroot.'/lib/tablelib.php');
 use table_sql;
 use moodle_url;
 use html_writer;
+use core_reportbuilder\manager;
+use core_reportbuilder\permission;
 
 /**
  * Automation instances table handler.
@@ -102,7 +104,6 @@ class auto_instances extends table_sql {
         // Fetch the templates data with its actions for all the instances.
         $templatedata = \mod_pulse\automation\templates::get_templates_record($templates);
         // Merge each instances with its templatedata, it will assign the template data for non overridden fields for instance.
-
         foreach ($rawdata as $key => $data) {
             $templateid = $data->templateid;
             if (isset($templatedata[$templateid])) {
@@ -110,7 +111,7 @@ class auto_instances extends table_sql {
                 $this->rawdata[$key] = \mod_pulse\automation\helper::merge_instance_overrides($data, $templatedata[$templateid]);
             }
         }
-
+        // Filter the data.
         $this->rawdata = array_filter($this->rawdata);
 
     }
@@ -199,26 +200,26 @@ class auto_instances extends table_sql {
         );
 
         // Instance reports builder view.
-        $actions[] = array(
-            'url' => new \moodle_url($listurl, ['action' => 'report']),
-            'icon' => new \pix_icon('i/calendar', \get_string('instancereport', 'pulse')),
-            'attributes' => array('class' => 'action-report', 'target' => '_blank')
-        );
-
-        // Show/Hide.
-        if ($row->status) {
+        if ($this->can_view_reports()) {
             $actions[] = array(
-                'url' => new \moodle_url($listurl, array('action' => 'disable')),
-                'icon' => new \pix_icon('t/hide', \get_string('hide')),
-                'attributes' => array('data-action' => 'hide', 'class' => 'action-hide')
-            );
-        } else {
-            $actions[] = array(
-                'url' => new \moodle_url($listurl, array('action' => 'enable')),
-                'icon' => new \pix_icon('t/show', \get_string('show')),
-                'attributes' => array('data-action' => 'show', 'class' => 'action-show')
+                'url' => new \moodle_url($listurl, ['action' => 'report']),
+                'icon' => new \pix_icon('i/calendar', \get_string('instancereport', 'pulse')),
+                'attributes' => array('class' => 'action-report', 'target' => '_blank')
             );
         }
+
+        // Show/Hide.
+        $checked = ($row->status) ? ['checked' => 'checked'] : [];
+        $checkbox = html_writer::div(
+            html_writer::empty_tag('input',
+                ['type' => 'checkbox', 'class' => 'custom-control-input'] + $checked
+            ) . html_writer::tag('span', '', ['class' => 'custom-control-label']),
+            'custom-control custom-switch'
+        );
+        $statusurl = new \moodle_url($listurl, array('action' => ($row->status) ? 'disable' : 'enable'));
+        $statusclass = 'pulse-instance-status-switch ';
+        $statusclass .= $row->status ? 'action-hide' : 'action-show';
+        $actions[] = html_writer::link($statusurl->out(false), $checkbox, ['class' => $statusclass]);
 
         // Delete.
         $actions[] = array(
@@ -246,25 +247,15 @@ class auto_instances extends table_sql {
     }
 
     /**
-     * Create a navbar switch for toggling editing mode.
+     * Verify the current user can able to view the reports.
      *
-     * @param stdclass $row
-     * @return string Html containing the edit switch
+     * @return bool
      */
-    public function edit_switch($row) {
-        global $PAGE, $OUTPUT;
-
-        if ($PAGE->user_allowed_editing()) {
-
-            $temp = (object) [
-                'legacyseturl' => (new moodle_url('/mod/pulse/automation/templates/list.php',
-                    ['id' => $row->id, 'sesskey' => sesskey()]))->out(false),
-                'pagecontextid' => $PAGE->context->id,
-                'pageurl' => $PAGE->url,
-                'sesskey' => sesskey(),
-                'checked' => $row->status
-            ];
-            return $OUTPUT->render_from_template('pulse/status_switch', $temp);
-        }
+    public function can_view_reports() {
+        // Create template instance. Actions are performed in template instance.
+        $reportid = \mod_pulse\automation\instances::get_reportid();
+        $report = manager::get_report_from_id($reportid);
+        return permission::can_view_report($report->get_report_persistent());
     }
+
 }

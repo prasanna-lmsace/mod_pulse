@@ -50,8 +50,10 @@ $string['before'] = 'Before';
 $string['after'] = 'After';
 
 $string['suppressnotification'] = 'Suppress notification';
-$string['description'] = 'Description';
-$string['content'] = 'Content';
+$string['dynamicplacholder'] = 'Placeholder';
+$string['dynamicdescription'] = 'Description';
+$string['dynamiccontent'] = 'Content';
+
 $string['teaser'] = 'Teaser';
 $string['full_linked'] = 'Full linked';
 $string['full_not_linked'] = 'Full not linked';
@@ -142,3 +144,6 @@ $string['coursehidden'] = 'Course is hidden from the students. <span> Please ena
 $string['noactiveusers'] = 'Course doesn\'t contain any active enrolments. <span> Please enroll users in the course.</span>';
 $string['coursenotstarted'] = 'Course has not started. <span> Please set the course start date to a date in the past.</span>';
 $string['courseenddatereached'] = 'Course has ended. <span> Please set the course end date to a date in the future or remove the end date.</span>';
+// ...Reports filter string.
+$string['automationinstance'] = 'Automation instance';
+$string['automationtemplate'] = 'Automation template';

@@ -167,20 +167,6 @@ class schedule {
 
             $sender = $this->find_sender_user();
 
-            if (is_string($sender)) {
-                $replyto = $sender;
-                $sender = (object) [
-                    'from' => $replyto,
-                    'firstname' => '',
-                    'lastname' => '',
-                    'firstnamephonetic' => '',
-                    'lastnamephonetic' => '',
-                    'middlename' => '',
-                    'alternatename' => '',
-                    'firstname' => '',
-                    'lastname' => '',
-                ];
-            }
             // Add bcc and CC to sender user custom headers.
             $sender->customheaders = [
                 "Bcc: $detail->bcc\r\n",
@@ -209,8 +195,9 @@ class schedule {
             $pulse = (object) ['course' => $this->course->id];
             // TODO: NOTE using notification API takes 16 queries. Direct email_to_user method will take totally 9 queries.
             // Send the notification to user.
-            $messagesend = email_to_user($detail->recepient, $sender, $subject,
-                $messageplain, $messagehtml, '', '', true, $replyto ?? '');
+            $messagesend = \mod_pulse\helper::messagetouser(
+                $detail->recepient, $subject, $messageplain, $messagehtml, $pulse, $sender
+            );
 
             if ($messagesend) {
                 // Update the current time as lastrun.
@@ -283,22 +270,23 @@ class schedule {
         // Number of notification to send in this que.
         $limit = get_config('pulse', 'schedulecount') ?: 100;
 
+        // Trigger the schedules for sepecied users.
         $userwhere = $userid ? ' AND ns.userid =:userid ' : '';
         $userparam = $userid ? ['userid' => $userid] : [];
 
         // Fetch the schedule which is status as 1 and nextrun not empty and not greater than now.
         $sql = "SELECT $select FROM {pulseaction_notification_sch} ns
-            JOIN {pulse_autoinstances} AS ai ON ai.id = ns.instanceid
-            JOIN {pulse_autotemplates} AS pat ON pat.id = ai.templateid
-            JOIN {pulse_autotemplates_ins} AS pati ON pati.instanceid = ai.id
-            JOIN {pulseaction_notification_ins} AS ni ON ni.instanceid = ns.instanceid
-            JOIN {pulseaction_notification} AS an ON an.templateid = ai.templateid
-            JOIN {user} AS ue ON ue.id = ns.userid
-            JOIN {course} as c ON c.id = ai.courseid
-            JOIN {context} AS ctx ON ctx.instanceid = c.id AND ctx.contextlevel = 50
-            LEFT JOIN {pulse_condition_overrides} AS con ON con.instanceid = pati.instanceid AND con.triggercondition = 'session'
-            LEFT JOIN {course_modules} AS cm ON cm.id = ni.dynamiccontent
-            LEFT JOIN {modules} AS md ON md.id = cm.module
+            JOIN {pulse_autoinstances} ai ON ai.id = ns.instanceid
+            JOIN {pulse_autotemplates} pat ON pat.id = ai.templateid
+            JOIN {pulse_autotemplates_ins} pati ON pati.instanceid = ai.id
+            JOIN {pulseaction_notification_ins} ni ON ni.instanceid = ns.instanceid
+            JOIN {pulseaction_notification} an ON an.templateid = ai.templateid
+            JOIN {user} ue ON ue.id = ns.userid
+            JOIN {course} c ON c.id = ai.courseid
+            JOIN {context} ctx ON ctx.instanceid = c.id AND ctx.contextlevel = 50
+            LEFT JOIN {pulse_condition_overrides} con ON con.instanceid = pati.instanceid AND con.triggercondition = 'session'
+            LEFT JOIN {course_modules} cm ON cm.id = ni.dynamiccontent
+            LEFT JOIN {modules} md ON md.id = cm.module
             JOIN (
                 SELECT DISTINCT eu1_u.id, ej1_e.courseid, COUNT(ej1_ue.enrolid) AS activeenrolment
                     FROM {user} eu1_u
@@ -308,8 +296,8 @@ class schedule {
                 AND (ej1_ue.timestart = 0 OR ej1_ue.timestart <= :timestart)
                 AND (ej1_ue.timeend = 0 OR ej1_ue.timeend > :timeend)
                 GROUP BY eu1_u.id, ej1_e.courseid
-            ) AS active_enrols ON active_enrols.id = ue.id AND active_enrols.courseid = c.id
-            WHERE ns.status = :status
+            ) active_enrols ON active_enrols.id = ue.id AND active_enrols.courseid = c.id
+            WHERE ns.status = :status AND ai.status <> 0
             AND active_enrols.activeenrolment <> 0
             AND c.visible = 1
             AND c.startdate <= :startdate AND  (c.enddate = 0 OR c.enddate >= :enddate)
@@ -419,10 +407,34 @@ class schedule {
      * @return mixed Returns either a string with the custom sender email, or an object representing the sender user.
      */
     protected function find_sender_user() {
+        global $CFG;
+
         // Find the sender for this schedule.
         if ($this->notificationdata->sender == notification::SENDERCUSTOM) {
+            // Find the user from moodle for this custom email.
+            $sender = \core_user::get_user_by_email($this->notificationdata->senderemail);
             // Use the custom sender email as the support user email.
-            $sender = $this->notificationdata->senderemail;
+            $senderemail = $this->notificationdata->senderemail;
+
+            // SEnder is not found and is a custom email. then create dummy user data with custom email.
+            if (empty($sender)) {
+                $replyto = $senderemail;
+                $expsender = explode('@', $senderemail);
+
+                $sender = (object) [
+                    'id' => $CFG->siteguest, // Send the notification as guest user.
+                    'email' => $senderemail,
+                    'from' => $replyto,
+                    'firstname' => $expsender[0] ?? $senderemail, // Use the first part of the email as firstname of the user.
+                    'lastname' => '',
+                    'firstnamephonetic' => '',
+                    'lastnamephonetic' => '',
+                    'middlename' => '',
+                    'alternatename' => '',
+                    'maildisplay' => \core_user::MAILDISPLAY_EVERYONE
+                ];
+            }
+
         } else if ($this->notificationdata->sender == notification::SENDERTENANTROLE) {
             $sender = $this->notification->get_tenantrole_sender($this->schedulerecord);
         } else {
@@ -521,12 +533,14 @@ class schedule {
             $finalsessiondata->capacity = $session->capacity;
             $finalsessiondata->normalcost = format_cost($session->normalcost);
             $finalsessiondata->discountcost = format_cost($session->discountcost);
+            $finalsessiondata->link = $CFG->wwwroot . "/mod/facetoface/signup.php?s=$session->id";
 
             $formatedtime = facetoface_format_session_times($session->timestart, $session->timefinish, null);
             $finalsessiondata = (object) array_merge((array) $finalsessiondata, (array) $formatedtime);
-
+            // Fetch the sessions custom fields.
             $customfields = facetoface_get_session_customfields();
             $finalsessiondata->customfield = new \stdclass();
+            // Include the session custom fields.
             foreach ($customfields as $field) {
                 $finalsessiondata->customfield->{$field->shortname} = facetoface_get_customfield_value(
                     $field, $session->sessionid, 'session');

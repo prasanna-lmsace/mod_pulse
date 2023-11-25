@@ -31,6 +31,7 @@ use DatePeriod;
 use mod_pulse\automation\helper;
 use pulseaction_notification\notification;
 use pulseaction_notification\schedule;
+use pulseaction_notification\task\notify_users;
 
 /**
  * Notification action form, contains important method and basic plugin details.
@@ -68,6 +69,23 @@ class actionform extends \mod_pulse\automation\action_base {
         parent::delete_instance_action($instanceid);
         $instancetable = 'pulseaction_notification_sch';
         return $DB->delete_records($instancetable, ['instanceid' => $instanceid]);
+    }
+
+    /**
+     * Instances disabled, then disable all the schedules of the instances.
+     *
+     * @param stdclass $instancedata
+     * @param bool $status
+     * @return void
+     */
+    public function instance_status_updated($instancedata, $status) {
+        global $DB;
+
+        $notificationid = $instancedata->actions['notification']['id'];
+        $notification = notification::instance($notificationid);
+        $notification->set_notification_data($instancedata->actions['notification'], $instancedata);
+
+        $notification->create_schedule_forinstance();
     }
 
     /**
@@ -154,7 +172,7 @@ class actionform extends \mod_pulse\automation\action_base {
      * Get text editor options to manage files.
      *
      * @param \stdclass $context
-     * @return void
+     * @return array
      */
     protected function get_editor_options($context=null) {
         global $PAGE;
@@ -202,10 +220,16 @@ class actionform extends \mod_pulse\automation\action_base {
     public function trigger_action($instancedata, $userid, $expectedtime=null, $newuser=false) {
 
         $notification = notification::instance($instancedata->pulsenotification_id);
-        $notificationinstance = helper::filter_record_byprefix($instancedata, $this->config_shortname());
+        $notificationinstance = (object) helper::filter_record_byprefix($instancedata, $this->config_shortname());
 
         $notification->set_notification_data($notificationinstance, $instancedata);
 
+        // Find the suppress conditions are reached.
+        $course = $instancedata->course;
+        $suppressreached = notify_users::is_suppress_reached($notificationinstance, $userid, $course, null);
+        if ($suppressreached) { // Suppress reached not need to setup new schedules.
+            return '';
+        }
         // Create a schedule for user. This method verify the user activity completion before creating schedules.
         $notification->create_schedule_foruser($userid, '', null, $expectedtime ?? null, $newuser);
 
@@ -480,7 +504,7 @@ class actionform extends \mod_pulse\automation\action_base {
         $completion = new \completion_info(get_course($courseid));
         $activities = $completion->get_activities();
         array_walk($activities, function(&$value) {
-            $value = $value->name;
+            $value = format_string($value->name);
         });
 
         $suppress = $mform->createElement('autocomplete', 'pulsenotification_suppress',
@@ -501,12 +525,18 @@ class actionform extends \mod_pulse\automation\action_base {
         $mform->addHelpButton('pulsenotification_suppressoperator', 'suppressoperator', 'pulseaction_notification');
 
         $modules = [0 => get_string('none')];
-        $books = $modinfo->get_instances_of('book');
-        $pages = $modinfo->get_instances_of('page');
-        $list = array_merge($books, $pages);
-        foreach ($list as $page) {
-            $modules[$page->id] = $page->get_formatted_name();
+        $list = $modinfo->get_instances();
+        $contentmods = [];
+        foreach ($list as $modname => $mods) {
+            foreach ($mods as $mod) {
+                $modules[$mod->id] = $mod->get_formatted_name();
+                if ($mod->modname == 'page' || $mod->modname == 'book') {
+                    $contentmods[] = $mod->id;
+                }
+            }
         }
+        // PAGE modules in this course.
+        $pages = $modinfo->get_instances_of('page');
 
         $dynamic = $mform->createElement('select', 'pulsenotification_dynamiccontent',
             get_string('dynamiccontent', 'pulseaction_notification'), $modules);
@@ -515,8 +545,9 @@ class actionform extends \mod_pulse\automation\action_base {
 
         // Add 'content_type' element with the following options.
         $contenttypeoptions = array(
-            notification::DYNAMIC_DESCRIPTION => get_string('description', 'pulseaction_notification'),
-            notification::DYNAMIC_CONTENT => get_string('content', 'pulseaction_notification'),
+            notification::DYNAMIC_PLACEHOLDER => get_string('dynamicplacholder', 'pulseaction_notification'),
+            notification::DYNAMIC_DESCRIPTION => get_string('dynamicdescription', 'pulseaction_notification'),
+            notification::DYNAMIC_CONTENT => get_string('dynamiccontent', 'pulseaction_notification'),
         );
         $dynamic2 = $mform->createElement('select', 'pulsenotification_contenttype',
             get_string('contenttype', 'pulseaction_notification'), $contenttypeoptions);
@@ -559,7 +590,7 @@ class actionform extends \mod_pulse\automation\action_base {
         asort($mform->_elementIndex);
 
         $PAGE->requires->js_call_amd('pulseaction_notification/chaptersource', 'updateChapter',
-            ['contextid' => $PAGE->context->id]
+            ['contextid' => $PAGE->context->id, 'contentmods' => $contentmods]
         );
     }
 

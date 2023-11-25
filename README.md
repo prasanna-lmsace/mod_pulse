@@ -1,68 +1,39 @@
 # About Pulse - 2.0
 
-## Background
+Pulse streamlines and automates processes within the system based on predefined conditions or events. When these conditions are met, such as a student completing an assignment or an important announcement being made, Pulse takes immediate action by sending notifications to the relevant users. This functionality not only simplifies and expedites communication but also enhances user engagement and overall efficiency within the system. Pulse's ability to automate notifications can greatly improve the user experience and reduce the manual effort required for managing and disseminating important information.
 
-Pulse revolves around the idea of automating courses. In its current form, this is achieved through an activity that triggers an action based on availability status. Moodle provides various availability conditions that can be deeply integrated with learning content, and additional triggers can be added by creating availability conditions.
 
-While this approach is highly flexible, it may not be immediately intuitive as it combines course content with automation. While both are integral to a course's learning path, not all teachers may find this approach comfortable. Another challenge is that determining availability on a large scale can be resource-intensive and require a robust server.
-
-To address these issues, we aim to revamp the architecture of Pulse for the next version. Our goals include improving scalability, enhancing robustness, and simplifying usability. We discuss our general goals, followed by requirements and implementation notes. We then introduce the concept of automation templates, which can be used to create automation instances in courses.
-
-Finally, we specify the requirements for a report source for Moodle's custom report builder, which will be used for a notification queue.
-
-## Goals
-
-Based on our own experience with Pulse in various projects, as well as input from customers and partners, we aim to achieve the following goals with Pulse 2.0:
-
-**Focused:** We developed Pulse because we consistently encountered specific issues within courses. These issues, while somewhat heterogeneous due to their course-based nature, have made it challenging to immediately grasp the essence of Pulse. Therefore, the next release will refine Pulse into a product primarily designed for course automation, with the initial major focus on notifications.
-
-**Robust:** Despite its high flexibility, Pulse has occasionally proven to be somewhat finicky, particularly concerning the availability status. This fragility is attributable to the diverse array of availability conditions and their susceptibility to changes. In the next release, we intend to enhance Pulse's robustness and make troubleshooting easier.
-
-**Scalable:** Pulse's current resource-intensive demands stem from the complex queries required to determine availability status. Our goal for the next release is to ensure that Pulse functions smoothly on standard Moodle hosting infrastructure, even for mid-sized installations, without resource-related issues.
-
-**Intuitive:** While Pulse's integration as a course activity is advantageous for the learning path, customers have expressed reservations about including an activity in the course that, in many cases, should remain hidden from students. Therefore, the next release of Pulse will empower learning designers and teachers to choose whether or not to display an activity.
-
-**Easier to maintain:** Pulse comes with presets to simplify its use for teachers. However, once a preset has been applied, any subsequent changes to the template do not affect existing Pulse activities, posing significant maintenance challenges, especially on larger sites with potentially hundreds of courses, each containing numerous Pulse activities. In the next release, site administrators will gain the capability to create, update, and globally deploy automations, with the option to override them on a course/activity level.
-
-## Architecture
+# Architecture
 
 The new Pulse architecture comprises the following key components:
 
 1. **Automation Templates:**
 
-   These are globally managed by users with the appropriate capabilities.
+   These are globally managed by automation managers with the appropriate capabilities.
 
 2. **Automation Instances:**
 
-   These instances are created based on automation templates and are kept in sync with the automation template. They offer the option to override specific settings per instance.
+   These instances are generated in accordance with automation templates and are maintained in synchronization with their respective templates. They provide the flexibility to override specific settings on a per-instance basis.
 
 3. **Automation Conditions:**
 
-   Conditions trigger the automation and rely on events and/or completion. They are built in a modular way.
+   Conditions serve as triggers for automation and depend on events or task completions. They are constructed in a modular fashion for enhanced flexibility.
 
 4. **Automation Actions:**
 
-   These represent the outcomes of the automation, determining what actually happens. They are built in a modular way, with the initial scope primarily focusing on notifications.
+   These actions embody the results of the automation process, defining the actual events that occur. They are constructed in a modular fashion, with the initial priority centered primarily on notifications.
+
 
 # Pulse - General settings
 
-**Detailed log**
-
-Display a detailed log for a scheduled task, but only use it for troubleshooting purposes and disable it on a production site.
-
 **Number of schedule count**
 
-This setting allows you to control how many scheduled task notifications are sent during each cron run. By specifying a numerical value, you can regulate the rate at which system administrators receive notifications regarding the completion or status of scheduled tasks.
-
+This configuration option enables precise control over the quantity of scheduled task notifications dispatched during each cron execution. By specifying a numerical value, you can effectively manage the frequency at which system administrators receive notifications regarding the completion or status of scheduled tasks.
 
 ![Pulse-general-setting](https://github.com/bdecentgmbh/moodle-mod_pulse/assets/57126778/fe81d840-4fb0-4c7f-a605-c09d8e7a3853)
 
 
-# Automation templates
-
-Users with the appropriate permissions create automation templates globally, outside of courses. The template itself doesn't perform any actions; it serves as the foundation for instances.
-
-## Relation between templates and instances
+# Relation between templates and instances
 
 The relationship between templates and instances ensures that settings defined in the template are synchronized with instances based on that template, except when a specific setting in an instance has been overridden. This means that any changes made to a setting in the template will automatically apply to all instances derived from the template.
 
@@ -70,9 +41,13 @@ For each setting within an instance, there is an override toggle available to pr
 
 Within the template, there is information indicating the number of instances where a setting has been locally overridden. Clicking on this number will open a modal with a link to the corresponding automation instance.
 
+# Automation templates
+
+Users with the appropriate permissions create automation templates globally, independent of specific courses. The template itself doesn't perform any actions; it serves as the foundation for creating the instances.
+
 # Manage Automation templates lists
 
-Automation templates can function in different ways based on their configuration. They can serve as 'default' templates that are applied to new courses, they can be mandated for every course, or they can be used to create an automation instance from within a course.
+The 'Manage Automation Templates' provides comprehensive control over your automation templates. It empowers you to create new templates, efficiently organize existing ones through sorting and course category-based filtering. This presents a list of templates, each accompanied by additional options such as visibility, status, and editing for individual templates.
 
 ![Pulse-automation-template-lists](https://github.com/bdecentgmbh/moodle-mod_pulse/assets/57126778/ab734e1e-759f-4d11-928b-8c285eb44f67)
 
@@ -83,55 +58,57 @@ The 'Create new template' button that allow you to create custom templates for A
 
 ***Sort***
 
-It provides users with the ability to arrange and display a list of automation templates in a Alphabetic order by the 'Preferences'.
+It provides with the ability to arrange and display a list of automation templates in a alphabetic order by the 'Reference' parameter.
 
 ***Filter***
 
-It enables to filter and display a list of templates based on predefined categories.
+It provides the capability to filter and display a list of templates based on course categories.
 
-***Circle with Icon***
+***Template icon***
 
-The icon represents the enabled actions in the automation template. The following actions are available: 'Notification,' 'Assignment,' 'Membership,' and 'Skills'.
+The 'Bell' icon represents the actions enabled for notifications in the automation template. The available actions include 'Notification,' 'Assignment,' 'Membership,' and 'Skills.'
 
-***Template Title Name***
+***Template Title***
 
 The title of the automation template should provide a generic explanation of its purpose.
 
-***Pencil icon***
+***Edit Title***
 
-You can edit the template title by clicking on the pencil icon next to it.
+To modify the template title, simply click on the pencil icon located next to the template title.
 
 ***Notification Pills***
 
-The pills provide additional important information about the automation template. In this case, it explains that it's a notification
+The pills provide additional important information about the automation template. In this case, it explains that it's a notification.
 
-***Preferences***
+***Reference***
 
 This serves as the reference for the template, providing a unique identifier. It will be part of the unique identifier for the automation instance.
 
-***Cog icon***
+***Edit Settings***
 
-Click on this icon to edit the template.
+To make changes to the template, click on the 'Cog' icon.
 
-***Eye icon***
+***Visibility***
 
-Click on this icon to toggle the visibility of a template. A template that is not visible will be hidden in courses. Existing automation instances will still be available, but new ones cannot be added anymore.
+To adjust the visibility of a template, simply click on the 'Eye' icon. A template set to 'Not Visible' will be concealed within courses. Existing automation instances will remain accessible, but new instances cannot be created
 
-***Toggle Button***
+***Status***
 
-Use this toggle to enable or disable a template. When a template is disabled, it also disables all automation instances unless they are locally enabled using an override.
+Use this toggle to enable or disable a template. When a template is disabled, it also disables all automation instances unless they are locally enabled using an override. Enabling or disabling the template triggers the display of a modal window, allowing you to update the status of either the template alone or both the template and its instances.
 
 ***Number of Automation template instances Badge***
 
-How many automation instances are using the template? The number in brackets indicates the number of disabled instances.
+The count of automation instances currently utilizing the template is displayed, with the number in brackets indicating the quantity of disabled instances.
 
-# General settings
+
+
+## General settings
 
 1. **Title**
 
-   Provide a title for this automation template. This title is for administrative purposes and helps in identifying the template.
+   Provide a title for this automation template. This title is intended for administrative purposes and helps in identifying the template.
 
-2. **Preference**
+2. **Reference**
 
    Assign a reference to this automation template. This identifier is also for administrative purposes and assists in uniquely identifying the template.
 
@@ -143,7 +120,7 @@ How many automation instances are using the template? The number in brackets ind
 
 4. **Internal Notes**
 
-   Include any internal notes or information related to this automation template that will be visible on this template.
+   Including any internal notes or information relevant to this automation template. These details will be visible within the template for reference.
 
 5. **Status**
 
@@ -155,7 +132,7 @@ How many automation instances are using the template? The number in brackets ind
 
 6. **Tags**
 
-   Add tags to this template for administrative purposes. Tags can help categorize and organize templates.
+   Adding tags can help categorize and organize templates for administrative purposes.
 
 7. **Available for tenants**
 
@@ -163,12 +140,12 @@ How many automation instances are using the template? The number in brackets ind
 
 8. **Available in Course Categories**
 
-   Choose the course categories where this template should be available. Select one or more categories to determine where users can create instances based on this template.
+   Select the course categories to be available for the specific template. By selecting one or more categories, you can define where users have the option to create instances based on this template. In the event that no categories are selected, the template will be accessible across all categories.
 
 ![Pulse-automation-template - Edit settings](https://github.com/bdecentgmbh/moodle-mod_pulse/assets/57126778/d4220218-02f2-4069-ace5-bcf05953250c)
 
 
-### Conditions
+## Conditions
 
 1. **Trigger**
 
@@ -195,25 +172,35 @@ How many automation instances are using the template? The number in brackets ind
 ![Pulse-automation-template - Condition](https://github.com/bdecentgmbh/moodle-mod_pulse/assets/57126778/843795af-0972-490b-b078-cf69fc837eb1)
 
 
-### Notifications
+## Notifications
 
 1. **Sender**
 
-   Determines how the selected triggers are evaluated. Choose the sender of the notification from the following options:
+   Determines how the selected triggers are evaluated.
 
-   **Course Teacher:** The notification will be sent from the course teacher (the first one assigned if there are several). If the user is not in any group, it falls back to the site support contact. Note that this is determined by capability, not by an actual role.
+   Choose the sender of the notification from the following options:
 
-   **Group Teacher:** The notification will be sent from the non-editing teacher who is a member of the same group as the user (the first one assigned if there are several). If there's no non-editing teacher in the group, it falls back to the course teacher. Note that this is determined by capability, not by an actual role.
+   **Course Teacher:** The notification will be dispatched from the course teacher, specifically the first one assigned if there are multiple course teachers. In the event that the user is not part of any group, the notification will default to the site support contact.
 
-   **Tenant Role (Workplace Feature):** The notification will be sent from the user assigned to the specified role in the tenant (the first one assigned if there are several). If there's no user with the selected role, it falls back to the site support contact. Note that this is determined by capability, not by an actual role.
+   *`Note that this is determined by capability, not by an actual role.`*
 
-   **Custom:** If this option is selected, an additional setting for 'Sender Email' will become available. Here, you can enter a specific email address to be used as the sender.
+   **Group Teacher:** The notification will be dispatched by the non-editing teacher who belongs to the same group as the user, specifically the first non-editing teacher assigned if there are multiple in the group. If no non-editing teacher is present in the group, the notification will default to the course teacher.
+
+   *`Note that this is determined by capability, not by an actual role.`*
+
+   **Tenant Role (Workplace Feature):** The notification will be initiated by the user designated to the specified role within the tenant, with preference given to the first one assigned if there are multiple users in that role. In the absence of any user with the selected role, the notification will revert to the site support contact.
+
+   *`Note that this is determined by capability, not by an actual role.`*
+
+   **Custom:** If this option is enabled, an additional configuration for 'Sender Email' will be accessible. In this field, you have the option to specify a precise email address for use as the sender.
 
    ***Sender email:*** You can enter a specific email address to be used as the sender.
 
 2. **Schedule**
 
-   This scheduling allows you to control when the notification is delivered to its intended recipients. Choose the interval for sending notifications:
+   This scheduling allows you to control when the notification is delivered to its intended recipients.
+
+   Choose the interval for sending notifications:
 
    **Once:** Send the notification only one time.
 
@@ -225,127 +212,131 @@ How many automation instances are using the template? The number in brackets ind
 
 3. **Delay**
 
-   A notification that is postponed for a specific period before it is sent to the recipient. Choose the delay option for sending notifications.
+   A notification that is postponed for a specific period before it is sent to the recipient.
 
-   **None:** Send notifications immediately upon the condition being met, considering the schedule limitations (e.g., weekday or time of day).
+   Choose the delay option for sending notifications.
 
-   **Before X Days/Hours:** Send the notification a specified number of days/hours before the condition is met. Note that this is only possible for timed events, e.g., appointment sessions.
+   **None:** Send notifications immediately upon the condition being met.
 
-   **After X Days/Hours:** Send the notification a specified number of days/hours after the condition is met. This is possible for all conditions.
+   **Before:** The notification to be dispatched a specified number of days or hours before the condition is met. It's important to note that this feature is exclusively applicable to timed events, such as appointment sessions.
 
-4. **Limit Number of Notifications**
+   **After:** The notification to be dispatched a specific number of days or hours after the condition has been met. This functionality is available for all types of conditions..
 
-    This limit is typically imposed to prevent users from receiving an excessive number of notifications, which could be overwhelming or spammy. Enter a number to limit the total number of notifications sent. Enter "0" for no limit. This is only relevant if the schedule is not set to "Once."
+4. **Delay duraion**
 
-5. **Recipients**
+   The duration time for the delay in sending the notification. This duration should be specified in either days or hours, depending on the chosen delay option.
 
-   Select one or more roles that have the capability to receive notifications. By default, it's set for all graded roles, including students. Users selected here will be used in the query to determine who gets notifications.
+5. **Limit Number of Notifications**
 
-6. **CC**
+   This limit is typically imposed to prevent users from receiving an excessive number of notifications, which could be overwhelming or spammy. Enter a number to limit the total number of notifications sent. Enter "0" for no limit. This is only relevant if the schedule is not set to "Once."
 
-   Select course context and user context roles that will receive the notification as a CC (Carbon Copy) alongside the main recipient. Course context roles determine users based on their enrollment in the course and membership in a group, while user context roles determine users based on their relationship to the recipient (assigned role in user).
+6. **Recipients**
 
-7. **BCC**
+   The selected roles with the capability to receive notifications will be used for determining the recipients of notifications.
 
-   Select course context and user context roles that will receive the notification as a BCC (Blind Carbon Copy) alongside the main recipient. Course context roles determine users based on their enrollment in the course and membership in a group, while user context roles determine users based on their relationship to the recipient (assigned role in user).
+7. **CC**
 
-8. **Subject**
+   The selected roles with the capability to receive notifications will be used as a CC (Carbon Copy) to the main recipient.
 
-   Refers to the title or headline that you would provide for an notification to briefly describe the content or purpose of the notification
+8. **BCC**
 
-9. **Header Content**
+   The selected roles with the capability to receive notifications will be used as a BCC (Blind Carbon Copy) to the main recipient.
 
-   The context of email notifications refers to the information and elements displayed at the top of an email message before the main body of the email. This field supports filters and placeholders.
+9. **Subject**
 
-10. **Static Content**
+   Refers to the title that you would provide for an notification to briefly describe the content or purpose of the notification.
 
-      The context of email notifications refers to the fixed or unchanging elements within the email that do not vary from one email to another. This field supports filters and placeholders.
+10. **Header Content**
 
-11. **Footer Content**
+      The context of email notifications encompasses the information and elements that are presented at the outset of an email message, preceding the main body of the email. This field is equipped to accommodate filters and placeholders
+
+11. **Static Content**
+
+      Static content is positioned in the second segment of the notification content. This static content also offers support for filters and placeholders.
+
+12. **Footer Content**
 
       The context of notifications refers to the information and elements placed at the bottom of a notification message.
 
-12. **Preview**
+13. **Preview**
 
-      Click this button to open a modal window that displays the notification, allowing you to select an example user to determine the content of the notification.
+      This option displays the notification, enabling you to choose an example user for evaluating the notification's content within a modal window accessed by clicking the button.
 
 ![Pulse-automation-template - Notification](https://github.com/bdecentgmbh/moodle-mod_pulse/assets/57126778/b46142ed-a4f5-445a-b2ef-98691cb3bcfd)
 
 
 # Automation instances
 
-Based on the available automation templates within the current course, users with appropriate permissions can create automation instances. To create an automation instance, the user must select the automation template on the "Automation" page within a course and configure the instance accordingly.
-
-For each setting within an automation instance, the value from the template is used. If the user wants to deviate from the template's value, they can locally override it by toggling the switch to "override" and making local changes to the setting.
-
-Any changes made to the automation template will impact all instances where the setting has not been locally overridden. Automation instances inherit the same settings as the underlying automation template, with a few differences and exceptions.
+Users with the requisite permissions can generate automation instances by selecting an existing template. Within each automation instance, the initial values for settings are inherited from the template. However, should a user desire to deviate from the template's values, they have the option to locally override them by activating the 'override' toggle and implementing local adjustments to the settings.
 
 # Manage Automation instances lists
 
+Automation instances can be generated within pre-existing automation templates, offering the ability to effectively oversee instance lists with sorting options. This enables comprehensive control over each instance, with additional features including editing, duplication, viewing report, visibility, and instance deletion.
+
 ![Pulse-automation-instances](https://github.com/bdecentgmbh/moodle-mod_pulse/assets/57126778/3bc322af-a13f-489c-8699-187bce4d1097)
 
-***Select box***
+***Select Template***
 
-You can choose an automation template from the following list to create an automation instance.
+You can select an automation template from the following list in the drop-down box to create an automation instance.
 
 ***Add Automation Instances***
 
-The 'Add automation instances' button that allows you to create automation instances in the selected automation template.
+The 'Add automation instances' button that allow you to create custom 'instance' for automation template.
 
 ***Manage templates***
 
-The 'Manage Templates' button redirects you to the Manage Automation Templates listing page.
+The 'Manage Templates' button redirects you to the Manage Automation Templates listing page to manage it.
 
 ***Sort***
 
-It provides users with the ability to arrange and display a list of automation instances in a Alphabets order by the 'Preferences'.
+It provides with the ability to arrange and display a list of automation instances in a Alphabets order by the 'Reference'.
 
-***Circle with Icon***
+***Instance icon***
 
-The icon represents the enabled actions in the automation template instances. The following actions are available: 'Notification,' 'Assignment,' 'Membership,' and 'Skills'.
+The 'Bell' icon represents the actions enabled for notifications in the automation template instance. The available actions include 'Notification,' 'Assignment,' 'Membership,' and 'Skills.'
 
-***Instances Title Name***
+***Instances Title***
 
-The title of the automation instances should provide a generic explanation of its purpose.
+The title of the automation template instance should provide a generic explanation of its purpose.
 
-***Pencil icon***
+***Edit Title***
 
-You can edit the automation instances title by clicking on the pencil icon next to it.
+To modify the template title, simply click on the pencil icon located next to the instance title.
 
 ***Notification Pills***
 
-The pills provide additional important information about the automation instances. In this case, it explains that it's a notification.
+The pills provide additional important information about the automation instance. In this case, it explains that it's a notification.
 
-***Preferences***
+***Reference***
 
-This serves as the reference for the automation instances, providing a unique identifier. It will be part of the unique identifier for the automation instance.
+This serves as the reference for the instance, providing a unique identifier. It will be part of the unique identifier for the automation instance.
 
-***Cog icon***
+***Edit settings***
 
-Click on this cog icon to edit the automation instances settings.
+To make changes to the instance, click on the 'Cog' icon.
 
-***Duplicate icon***
+***Duplicate Instance***
 
-Click on this copy icon to duplicate the specific automation instances.
+To duplicate specific automation instances, click on this 'Copy' icon.
 
-***Calendar icon***
+***Instances Report***
 
-Click on this Calendar icon to view the report page of the automation instances schedule. This report will display the 'Course full name', 'Message type,' 'Subject,' 'Full name,' 'Time created,' 'Scheduled time,' 'Status,' and you can also 'Download table data.'
+To access the report page of the automation instance schedule, click on the 'Calendar' icon. This report will provide details including 'Course full name,' 'Message type,' 'Subject,' 'Full name,' 'Time created,' 'Scheduled time,' 'Status,' and the option to 'Download table data.
 
-***Eye icon***
+***Visibility***
 
-Use this toggle to enable or disable the automation instance locally. This will override the template's status. For example, even if the template is turned off, it can still be enabled here.
+To adjust the visibility of a template, simply click on the 'Eye' icon. A template set to 'Not Visible' will be concealed within courses. Existing automation instances will remain accessible, but new instances cannot be created
 
-***Delete icon***
+***Delete Instances***
 
-Clicking on this delete icon will remove the specific automation instances from the automation template.
+To remove specific automation instances from the automation template, simply click on the 'Bin' icon.
 
 
-# General settings
+## General settings
 
 1. **Title**
 
-   Provide a title for this automation template. This title is for administrative purposes and helps in identifying the template.
+   Provide a title for this automation template instance. This title is for administrative purposes and helps in identifying the template.
 
    *`Toggle button - If you enable the toggle button, the provided value will be applied for the 'title' in the instance; otherwise, the automation templates value of the 'title'  will be applied.`*
 
@@ -373,7 +364,7 @@ Clicking on this delete icon will remove the specific automation instances from 
 
 5. **Tags**
 
-   Add tags to this template for administrative purposes. Tags can help categorize and organize templates.
+   Adding tags can help categorize and organize templates for administrative purposes.
 
    *`Toggle button - If you enable the toggle button, the provided value will be applied for the 'tags' in the instance; otherwise, the automation templates value of the 'tags' will be applied.`*
 
@@ -408,7 +399,9 @@ Clicking on this delete icon will remove the specific automation instances from 
 
    **Upcoming:** Activity completion condition only applies to future enrollments. Enabling this option will make the 'Select Activities' option visible.
 
-   *`'Select Activities: This setting allows you to choose from all available activities within your course that have completion configured. This selection determines which specific activities will trigger the automation when their completion conditions are met.`*
+   ***Select Activities:*** This setting allows you to choose from all available activities within your course that have completion configured. This selection determines which specific activities will trigger the automation when their completion conditions are met.
+
+   *`Toggle button - If you enable the toggle button, the provided option will be applied for the 'Activity completion' in the instance; otherwise, the automation templates of the 'Activity completion' option will be applied.`*
 
 3. **Enrolments**
 
@@ -422,7 +415,7 @@ Clicking on this delete icon will remove the specific automation instances from 
 
 4. **Session Booking**
 
-   This automation will be triggered when a session module is booked within the course. This trigger is only available within the course and should be selected within the automation instance. The options for session triggers include:
+   This automation will activate when a session module is scheduled within the course. This trigger is exclusive to the course and should be chosen when configuring the automation instance. The options for session triggers include:
 
    ***Disabled:*** Session trigger is disabled.
 
@@ -457,7 +450,7 @@ Clicking on this delete icon will remove the specific automation instances from 
 ![Pulse-automation-instances - Condition](https://github.com/bdecentgmbh/moodle-mod_pulse/assets/57126778/00f33374-2235-495d-93c9-faed24a46aa7)
 
 
-### Notifications
+## Notifications
 
 1. **Sender**
 
@@ -465,13 +458,19 @@ Clicking on this delete icon will remove the specific automation instances from 
 
    Choose the sender of the notification from the following options:
 
-   **Course Teacher:** The notification will be sent from the course teacher (the first one assigned if there are several). If the user is not in any group, it falls back to the site support contact. Note that this is determined by capability, not by an actual role.
+   **Course Teacher:** The notification will be dispatched from the course teacher, specifically the first one assigned if there are multiple course teachers. In the event that the user is not part of any group, the notification will default to the site support contact.
 
-   **Group Teacher:** The notification will be sent from the non-editing teacher who is a member of the same group as the user (the first one assigned if there are several). If there's no non-editing teacher in the group, it falls back to the course teacher. Note that this is determined by capability, not by an actual role.
+   *`Note that this is determined by capability, not by an actual role.`*
 
-   **Tenant Role (Workplace Feature):** The notification will be sent from the user assigned to the specified role in the tenant (the first one assigned if there are several). If there's no user with the selected role, it falls back to the site support contact. Note that this is determined by capability, not by an actual role.
+   **Group Teacher:** The notification will be dispatched by the non-editing teacher who belongs to the same group as the user, specifically the first non-editing teacher assigned if there are multiple in the group. If no non-editing teacher is present in the group, the notification will default to the course teacher.
 
-   **Custom:** If this option is selected, an additional setting for 'Sender Email' will become available. Here, you can enter a specific email address to be used as the sender.
+   *`Note that this is determined by capability, not by an actual role.`*
+
+   **Tenant Role (Workplace Feature):** The notification will be initiated by the user designated to the specified role within the tenant, with preference given to the first one assigned if there are multiple users in that role. In the absence of any user with the selected role, the notification will revert to the site support contact.
+
+   *`Note that this is determined by capability, not by an actual role.`*
+
+   **Custom:** If this option is enabled, an additional configuration for 'Sender Email' will be accessible. In this field, you have the option to specify a precise email address for use as the sender.
 
    ***Sender email:*** You can enter a specific email address to be used as the sender.
 
@@ -500,57 +499,69 @@ Clicking on this delete icon will remove the specific automation instances from 
 
    Choose the delay option for sending notifications.
 
-   **None:** Send notifications immediately upon the condition being met, considering the schedule limitations (e.g., weekday or time of day).
+   **None:** Send notifications immediately upon the condition being met.
 
-   **Before X Days/Hours:** Send the notification a specified number of days/hours before the condition is met. Note that this is only possible for timed events, e.g., appointment sessions.
+   **Before:** The notification to be dispatched a specified number of days or hours before the condition is met. It's important to note that this feature is exclusively applicable to timed events, such as appointment sessions.
 
-   **After X Days/Hours:** Send the notification a specified number of days/hours after the condition is met. This is possible for all conditions.
+   **After:** The notification to be dispatched a specific number of days or hours after the condition has been met. This functionality is available for all types of conditions..
 
    *`Toggle button - If you enable the toggle button, the provided option will be applied for the 'Delay' in the instance; otherwise, the automation templates option of the 'Delay' will be applied.`*
 
-4. **Limit Number of Notifications**
+4. **Delay duraion**
+
+   The duration time for the delay in sending the notification. This duration should be specified in either days or hours, depending on the chosen delay option.
+
+5. **Suppress module**
+
+   The "Suppress Module" functions by proactively preventing the dispatch of notifications once one or more selected activities have been successfully completed.
+
+6. **Suppress Operator**
+
+   The selection of the "suppression operator" is pivotal in determining the precise influence of these activities on the overall notification process.
+
+7. **Limit Number of Notifications**
 
    This limit is typically imposed to prevent users from receiving an excessive number of notifications, which could be overwhelming or spammy. Enter a number to limit the total number of notifications sent. Enter "0" for no limit. This is only relevant if the schedule is not set to "Once."
 
    *`Toggle button - If you enable the toggle button, the provided option will be applied for the 'Limit Number of Notifications' in the instance; otherwise, the automation templates option of the 'Limit Number of Notifications' will be applied.`*
 
-5. **Recipients**
+8. **Recipients**
 
-   Select one or more roles that have the capability to receive notifications. By default, it's set for all graded roles, including students. Users selected here will be used in the query to determine who gets notifications.
+   The selected roles with the capability to receive notifications will be used for determining the recipients of notifications.
 
    *`Toggle button - If you enable the toggle button, the provided option will be applied for the 'Recipients' in the instance; otherwise, the automation templates option of the 'Recipients' will be applied.`*
 
-6. **CC**
+9. **CC**
 
-   Select course context and user context roles that will receive the notification as a CC (Carbon Copy) to the main recipient. Course context roles determine users by enrolment in the course and membership of a group, while user context roles determine users by their relation to the recipient (assigned role in user).
+   The selected roles with the capability to receive notifications will be used as a CC (Carbon Copy) to the main recipient.
 
    *`Toggle button - If you enable the toggle button, the provided option will be applied for the 'CC' in the instance; otherwise, the automation templates option of the 'CC' will be applied.`*
 
-7. **BCC**
+10. **BCC**
 
-   Select course context and user context roles that will receive the notification as a BCC (Blind Carbon Copy) to the main recipient. Course context roles determine users by enrolment in the course and membership of a group, while user context roles determine users by their relation to the recipient (assigned role in user).
+      The selected roles with the capability to receive notifications will be used as a BCC (Blind Carbon Copy) to the main recipient.
 
-   *`Toggle button - If you enable the toggle button, the provided option will be applied for the 'BCC' in the instance; otherwise, the automation templates option of the 'BCC' will be applied.`*
+      *`Toggle button - If you enable the toggle button, the provided option will be applied for the 'BCC' in the instance; otherwise, the automation templates option of the 'BCC' will be applied.`*
 
-8. **Subject**
+11. **Subject**
 
-   Refers to the title or headline that you would provide for an notification to briefly describe the content or purpose of the notification
+      Refers to the title that you would provide for an notification to briefly describe the content or purpose of the notification.
 
-   *`Toggle button - If you enable the toggle button, the provided option will be applied for the 'Subject' in the instance; otherwise, the automation templates option of the 'Subject' will be applied.`*
+      *`Toggle button - If you enable the toggle button, the provided option will be applied for the 'Subject' in the instance; otherwise, the automation templates option of the 'Subject' will be applied.`*
 
-9. **Header Content**
+12. **Header Content**
 
-   The context of email notifications refers to the information and elements displayed at the top of an email message before the main body of the email. This field supports filters and placeholders.
+      The context of email notifications encompasses the information and elements that are presented at the outset of an email message, preceding the main body of the email. This field is equipped to accommodate filters and placeholders
 
-   *`Toggle button - If you enable the toggle button, the provided option will be applied for the 'Header Content' in the instance; otherwise, the automation templates option of the 'Header Content' will be applied.`*
+      *`Toggle button - If you enable the toggle button, the provided option will be applied for the 'Header Content' in the instance; otherwise, the automation templates option of the 'Header Content' will be applied.`*
 
-10. **Static Content**
+13. **Static Content**
 
-      The context of email notifications refers to the fixed or unchanging elements within the email that do not vary from one email to another. This field supports filters and placeholders.
+      Static content is positioned in the second segment of the notification content. This static content also offers support for filters and placeholders.
 
       *`Toggle button - If you enable the toggle button, the provided option will be applied for the 'Static Content' in the instance; otherwise, the automation templates option of the 'Static Content' will be applied.`*
 
-11. **Dynamic Content**
+14. **Dynamic Content**
 
       Select an activity within the course to add content below the static content. This is only available in the automation instance within the course.
 
@@ -564,7 +575,7 @@ Clicking on this delete icon will remove the specific automation instances from 
 
       ***Book:*** When you select the 'Book' activity option in Dynamic content, the 'Content Type' and 'Content Length' and 'Chapters' options will become visible.
 
-12. **Content Type**
+15. **Content Type**
 
       Refers to the format of the content being used that helps to describe the type of data or information contained within a resource. Please note that this feature supports specific mod types, such as Page and Book.
 
@@ -574,7 +585,7 @@ Clicking on this delete icon will remove the specific automation instances from 
 
       **Content**: If this option is chosen, the content of the selected activity will be included in the notification body.
 
-14. **Content Length**
+16. **Content Length**
 
       Refers to the size or extent of a piece of content.
 
@@ -586,22 +597,20 @@ Clicking on this delete icon will remove the specific automation instances from 
 
       **Full, Not Linked**: If 'Full, Not Linked' is selected, the entire content shall be used without a link to the content afterward.
 
-15. ***Chapters***
+17. ***Chapters***
 
       Refer to the divisions or sections within a book that help organize and structure the content.
 
       Select which chapters of the chosen activity will be included in the notification body. To view the chapter content, select the specific chapter using the 'Chapters' option and the content using the 'Content' option for the 'Book' activity.
 
-15. **Footer Content**
+18. **Footer Content**
 
-      The context of notifications refers to the information and elements placed at the bottom of a notification message. This field supports filters and placeholders.
+      The context of notifications refers to the information and elements placed at the bottom of a notification message.
 
       *`Toggle button - If you enable the toggle button, the provided option will be applied for the 'Footer Content' in the instance; otherwise, the automation templates option of the 'Footer Content' will be applied.`*
 
-16. **Preview**
+19. **Preview**
 
-      Click this button to open a modal window that displays the notification, allowing you to select an example user to determine the content of the notification.
+      This option displays the notification, enabling you to choose an example user for evaluating the notification's content within a modal window accessed by clicking the button.
 
 ![Pulse-automation-instances - Notification](https://github.com/bdecentgmbh/moodle-mod_pulse/assets/57126778/e16ca2ac-c191-49cb-8c90-3089e1f852e3)
-
-

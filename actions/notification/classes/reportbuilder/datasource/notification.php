@@ -27,6 +27,7 @@ namespace pulseaction_notification\reportbuilder\datasource;
 use core_reportbuilder\datasource;
 use core_reportbuilder\local\entities\course;
 use core_reportbuilder\local\entities\user;
+use core_reportbuilder\local\filters\select;
 
 /**
  * Notification datasource definition for the list of schedules.
@@ -120,7 +121,9 @@ class notification extends datasource {
      * @return array
      */
     public function get_default_filters(): array {
-        return [];
+        return [
+            'notification:instanceid'
+        ];
     }
 
     /**
@@ -129,8 +132,10 @@ class notification extends datasource {
      * @return array
      */
     public function get_default_conditions(): array {
+
         return [
             'notification:instanceid'
         ];
     }
+
 }

@@ -28,13 +28,14 @@ namespace pulseaction_notification;
 
 use book;
 use DateTime;
+use stdClass;
+use moodle_url;
+use html_writer;
+use pulseaction_notification\task\notify_users;
 use mod_pulse\automation\helper;
 use mod_pulse\automation\instances;
 use mod_pulse\helper as pulsehelper;
 use mod_pulse\plugininfo\pulseaction;
-use moodle_url;
-use html_writer;
-use stdClass;
 use tool_dataprivacy\form\context_instance;
 
 /**
@@ -125,6 +126,12 @@ class notification {
      * @var int
      */
     const LENGTH_NOTLINKED = 3;
+
+    /**
+     * Represents the content of the dynamic module is only for placeholder.
+     * @var int
+     */
+    const DYNAMIC_PLACEHOLDER = 0;
 
     /**
      * Represents the description of the dynamic module is included in the notification.
@@ -244,10 +251,16 @@ class notification {
      * @return void
      */
     public function set_notification_data($notificationdata, $instancedata) {
-        $data = (object) $notificationdata;
-        $this->notificationdata = $this->update_data_structure($data);
+        // Set the notification data.
+        $notificationdata = (object) $notificationdata;
+        $this->notificationdata = $this->update_data_structure($notificationdata);
 
-        $data = (object) $instancedata;
+        // Set the instance data.
+        $instancedata = (object) $instancedata;
+        // Instance not contains course then include course.
+        if (!isset($instancedata->course)) {
+            $instancedata->course = get_course($instancedata->courseid);
+        }
         $this->instancedata = $instancedata;
     }
 
@@ -456,6 +469,24 @@ class notification {
     }
 
     /**
+     * Disable the queued schdule for all users.
+     *
+     * @return void
+     */
+    protected function disable_schedules() {
+        global $DB;
+
+        $params = [
+            'instanceid' => $this->notificationdata->instanceid,
+            'status' => self::STATUS_QUEUED
+        ];
+
+        // Disable the queued schedules for this instance.
+        $DB->set_field('pulseaction_notification_sch', 'status', self::STATUS_DISABLED, $params);
+
+    }
+
+    /**
      * Removes the current queued schedules and recreate the schedule for all the qualified users.
      *
      * @return void
@@ -481,6 +512,12 @@ class notification {
             $this->create_instance_data();
         }
 
+        // Confirm the instance is not disabled.
+        if (!$this->instancedata->status) {
+            $this->disable_schedules();
+            return false;
+        }
+
         // Course context.
         $context = \context_course::instance($this->instancedata->courseid);
         // Roles to receive the notifications.
@@ -493,6 +530,11 @@ class notification {
         // Get the users for this receipents roles.
         $users = $this->get_users_withroles($roles, $context);
         foreach ($users as $userid => $user) {
+            $suppressreached = notify_users::is_suppress_reached(
+                $this->notificationdata, $userid, $this->instancedata->course, null);
+            if ($suppressreached) {
+                continue;
+            }
             $this->create_schedule_foruser($user->id, null, 0, null, $newenrolment);
         }
 
@@ -676,7 +718,7 @@ class notification {
      * @param \context $context
      * @return array List of the users.
      */
-    protected function get_users_withroles(array $roles, $context) {
+    protected function get_users_withroles(array $roles, $context, $childuserid=null) {
         global $DB;
 
         // TODO: Cache the role users.
@@ -690,8 +732,17 @@ class notification {
         $rolesql = "SELECT DISTINCT u.id, u.*, ra.roleid FROM {role_assignments} ra
         JOIN {user} u ON u.id = ra.userid
         JOIN {role} r ON ra.roleid = r.id
-        LEFT JOIN {role_names} rn ON (rn.contextid = :ctxid AND rn.roleid = r.id)
-        WHERE (ra.contextid = :ctxid2 ) AND ra.roleid $insql ORDER BY u.id";
+        LEFT JOIN {role_names} rn ON (rn.contextid = :ctxid AND rn.roleid = r.id) ";
+
+        // Fetch the parent users related to the child user.
+        $childcontext = '';
+        if ($childuserid) {
+            $rolesql .= " JOIN {context} uctx ON uctx.instanceid=:childuserid AND contextlevel=" . CONTEXT_USER . " ";
+            $childcontext = " OR ra.contextid = uctx.id ";
+            $inparams['childuserid'] = $childuserid;
+        }
+
+        $rolesql .= " WHERE (ra.contextid = :ctxid2 $childcontext) AND ra.roleid $insql ORDER BY u.id";
 
         $params = array('ctxid' => $context->id, 'ctxid2' => $context->id) + $inparams;
 
@@ -759,6 +810,7 @@ class notification {
         }
 
         $finalcontent = $headercontent . $staticcontent . $footercontent;
+
         return format_text($finalcontent, FORMAT_HTML, ['noclean' => true, 'overflowdiv' => true]);
     }
 
@@ -771,17 +823,22 @@ class notification {
      * @param \context $context
      * @param stdclass $cm
      *
-     * @return void
+     * @return string
      */
     public static function generate_dynamic_content($contenttype, $contentlength, $chapterid, $context, $cm) {
-
         global $CFG, $DB;
 
+        // Include module libarary files.
         require_once($CFG->dirroot.'/lib/modinfolib.php');
         require_once($CFG->dirroot.'/mod/book/lib.php');
         require_once($CFG->libdir.'/filelib.php');
 
-        if ($contenttype == self::DYNAMIC_CONTENT) {
+        // Content type is placholder, no need to include the content.
+        if ($contenttype == self::DYNAMIC_PLACEHOLDER) {
+            return '';
+        }
+
+        if ($contenttype == self::DYNAMIC_CONTENT && in_array($cm->modname, ['book', 'page'])) {
 
             if ($cm->modname == 'book') {
                 $chapter = $DB->get_record('book_chapters', ['id' => $chapterid, 'bookid' => $cm->instance]);
@@ -790,7 +847,7 @@ class notification {
 
                 $content = format_text($chaptertext, $chapter->contentformat, ['noclean' => true, 'overflowdiv' => true]);
                 $link = new moodle_url('/mod/book/view.php', ['id' => $cm->id, 'chapterid' => $chapterid]);
-            } else {
+            } else if ($cm->modname == 'page') {
                 $page = $DB->get_record('page', array('id' => $cm->instance), '*', MUST_EXIST);
 
                 $content = file_rewrite_pluginfile_urls(
@@ -830,14 +887,16 @@ class notification {
      * @param stdclass $user
      * @param \context $context
      * @param array $notificationoverrides
-     * @return array Basic details to send notification.
+     * @return stdclass Basic details to send notification.
      */
     public function generate_notification_details($moddata, $user, $context, $notificationoverrides=[]) {
+        global $USER;
 
         // Find the cc and bcc users for this schedule.
         $roles = array_merge($this->notificationdata->cc, $this->notificationdata->bcc);
+
         // Get the users for this bcc and cc roles.
-        $roleusers = $this->get_users_withroles($roles, $context);
+        $roleusers = $this->get_users_withroles($roles, $context, $user->id);
 
         // Filter the cc users for this instance.
         $cc = $this->notificationdata->cc;
@@ -851,6 +910,15 @@ class notification {
             return in_array($value->roleid, $bcc);
         });
 
+        // Set the recepient as session user for format content.
+        $olduser = $USER;
+        \core\session\manager::set_user($user);
+
+        // Use the current user language to filter content.
+        if ($user->lang != current_language()) {
+            $oldforcelang = force_current_language($user->lang);
+        }
+
         $result = [
             'recepient' => (object) $user,
             'cc'        => implode(',', array_column($ccusers, 'email')),
@@ -858,6 +926,14 @@ class notification {
             'subject'   => format_string($this->notificationdata->subject),
             'content'   => $this->build_notification_content($moddata, $context, $notificationoverrides),
         ];
+
+        // After format the message and subject return back to previous lang.
+        if (isset($oldforcelang)) {
+            force_current_language($oldforcelang);
+            unset($oldforcelang);
+        }
+        // Return to normal current session user.
+        \core\session\manager::set_user($olduser);
 
         return (object) $result;
     }
@@ -965,7 +1041,7 @@ class notification {
     }
 
     /**
-     * Get the list of modules data for the placholders.
+     * Get the list of modules data for the placholders. includes the metadata fields.
      *
      * @param array $modules List of modules.
      * @return array

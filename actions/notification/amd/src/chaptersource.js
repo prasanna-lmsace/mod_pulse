@@ -29,7 +29,7 @@ define(['jquery', 'core/ajax', 'core/notification', 'core/modal_factory', 'core/
     const previewModalBody = function(contextID, userid = null) {
 
         var params;
-        if (window.tinyMCE !== undefined) {
+        if (window.tinyMCE !== undefined && window.tinyMCE.get('id_pulsenotification_headercontent_editor')) {
             // EditorPlugin = window.tinyMCE;
             params = {
                 contentheader: window.tinyMCE.get('id_pulsenotification_headercontent_editor').getContent(),
@@ -130,12 +130,34 @@ define(['jquery', 'core/ajax', 'core/notification', 'core/modal_factory', 'core/
             }).fail(failure);
         },
 
-        updateChapter: function() {
+        updateChapter: function(ctxID, contentMods) {
 
             const SELECTORS = {
                 chaperType: "#id_pulsenotification_contenttype",
                 mod: "#id_pulsenotification_dynamiccontent"
             };
+
+            // Disable the content type option for modules other than book and page.
+            if (contentMods !== null) {
+                var type = document.querySelector(SELECTORS.chaperType);
+                document.querySelector(SELECTORS.mod).addEventListener("change", (e) => {
+                    var target = e.currentTarget;
+                    var selected = target.value;
+                    if (contentMods.includes(selected.toString())) {
+                        Array.prototype.find.call(type.options, function(cmid) {
+                            if (cmid.value == '2') {
+                                cmid.disabled = false;
+                            }
+                        });
+                    } else {
+                        Array.prototype.find.call(type.options, function(cmid) {
+                            if (cmid.value == '2') {
+                                cmid.disabled = true;
+                            }
+                        });
+                    }
+                });
+            }
 
             document.querySelector(SELECTORS.chaperType).addEventListener("change", () => resetChapter());
             document.querySelector(SELECTORS.mod).addEventListener("change", () => resetChapter());
@@ -153,6 +175,7 @@ define(['jquery', 'core/ajax', 'core/notification', 'core/modal_factory', 'core/
         },
 
         previewNotification: function(contextid) {
+
             var btn = document.querySelector('[name="pulsenotification_preview"]');
 
             if (btn === null) {
@@ -166,7 +189,7 @@ define(['jquery', 'core/ajax', 'core/notification', 'core/modal_factory', 'core/
 
         reportModal: function(contextID) {
             // View content.
-            var btn = document.querySelectorAll('[data-target="view-content"]');
+            /* var btn = document.querySelectorAll('[data-target="view-content"]');
 
             if (btn === null) {
                 return;
@@ -183,6 +206,21 @@ define(['jquery', 'core/ajax', 'core/notification', 'core/modal_factory', 'core/
                     notificationModal(contextID, instance, userid); // Notification modal.
                 });
             });
+ */
+
+            document.addEventListener('click', function(e) {
+
+                if (e.target.closest('[data-target="view-content"]') !== null) {
+
+                    var target = e.target.closest('a');
+
+                    var instance = target.dataset.instanceid;
+                    var userid = target.dataset.userid;
+
+                    notificationModal(contextID, instance, userid); // Notification modal.
+                }
+
+            })
         }
     };
 

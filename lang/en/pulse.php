@@ -264,7 +264,8 @@ $string['pulse:sender'] = 'Notification sender user';
 // ...Templates list string.
 $string['autotemplates'] = 'Automation templates';
 $string['automation'] = 'Automation';
-$string['autotemplates_desc'] = 'Automation templates define the kind of automations you can use on this moodle site. Depending on the configuration of an automation template, they either work as "default" and will be applied to new courses can be forced onto every course or can be used to create and automation instance from within a course.';
+$string['autotemplates_desc'] = 'Users with the appropriate permissions create automation templates globally, independent of specific courses. The template itself doesn\'t perform any actions, it serves as the foundation for creating the instances.';
+$string['autoinstance_desc'] = 'Users with the requisite permissions can generate automation instances by selecting an existing template. Within each automation instance, the initial values for settings are inherited from the template. However, should a user desire to deviate from the template\'s values, they have the option to locally override them by activating the "override" toggle and implementing local adjustments to the settings.';
 // ...create new template btn.
 $string['templatecreatenew'] = 'Create new template';
 // ...Edit templates page stirng.
@@ -347,7 +348,8 @@ $string['schedulecountdesc'] = 'This setting allows you to control how many sche
 
 // ...Automation templates table instruction help texts.
 $string['instruction'] = 'Instructions';
-$string['automationwelcomemsg'] = '<b> Welcome message </b>';
+$string['automation_title'] = '<b> Template title  </b>';
+$string['automation_reference'] = 'TEMPLATE_REFERENCE';
 $string['automationreferencedemo'] = 'WELCOME_MESSAGE';
 $string['automationtemplate_help1'] = 'The icon represents the enabled action(s) in the automation (template). the following actions are available: "Notification", "Assignment". "Membership", "Skills",';
 $string['automationtemplate_help2'] = 'The title of the automation <b>template</b>. This should be a generic explanation about what the template is for. It can be changed inline by clicking on the pencil icon.';
@@ -359,6 +361,8 @@ $string['automationtemplate_help7'] = 'Use this toggle to turn on or off a templ
 $string['automationtemplate_help8'] = 'How many automation instances are using the template? The number in brackets indicates the number of disabled instances.';
 
 // ...Automation instance table instruction help texts.
+$string['automationinstance_title'] = ' <b> Instance title  </b>';
+$string['automationinstance_reference'] = 'INSTANCE_REFERENCE';
 $string['automationinstance_help1'] = 'The icon represents the enabled action(s) in the automation (template). the following actions are available: "Notification", "Assignment". "Membership", "Skills",';
 $string['automationinstance_help2'] = 'The title of the automation <b>instance</b>. This should be a generic explanation about what the template is for. It can be changed inline by clicking on the pencil icon.';
 $string['automationinstance_help3'] = 'The pills provide additional improtant information about the automation instance. In this case, it explains that it\'s a notification.';
@@ -367,6 +371,10 @@ $string['automationinstance_help5'] = 'Click on this icon to edit the automation
 $string['automationinstance_help6'] = 'Duplicate the automation';
 $string['automationinstance_help7'] = 'Open the automation queue (in the report builder), which provides information about all the automations that ran.';
 $string['automationinstance_help8'] = 'Use this toggle to turn on or off the automation instance locally. This will override the status of the template, i.e. even if the template is turned off, it can be enabled.';
+$string['automationinstance_help9'] = 'Click on this icon to delete the automation instance.';
 
 // Pulse automation template profile navigation link.
 $string['pulsetemplink'] = "Pulse Automation Template";
+$string['completionenrolled'] = 'enrolled';
+// ...Automation template error.
+$string['errortemplatenotavailable'] = 'This automation template is not available for this course';
