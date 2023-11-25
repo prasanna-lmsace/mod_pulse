@@ -83,7 +83,8 @@ Feature: Pulse automation templates
     And I follow "Automation"
     Then I should see "Automation" in the "#region-main h2" "css_element"
     And ".template-add-form .custom-select#id_templateid" "css_element" should exist
-    Then I should see "WELCOME MESSAGE" in the ".template-add-form .custom-select" "css_element"
+    When I open the autocomplete suggestions list
+    And "WELCOME MESSAGE" "autocomplete_suggestions" should exist
     And I navigate to "Plugins > Activity modules > Pulse > Automation templates" in site administration
     Then I click on ".action-edit" "css_element" in the "WELCOME MESSAGE" "table_row"
     And I set the field "Visibility" to "Hidden"
@@ -140,7 +141,7 @@ Feature: Pulse automation templates
     Then I should see "Automation"
     And I follow "Automation"
     And ".template-add-form .custom-select#id_templateid" "css_element" should exist
-    Then I should see "WELCOME MESSAGE" in the ".template-add-form .custom-select" "css_element"
+     And "WELCOME MESSAGE" "autocomplete_suggestions" should exist
     # Course 2
     And I am on "Course 2" course homepage
     Then I should see "Automation"
@@ -162,13 +163,13 @@ Feature: Pulse automation templates
     Then I should see "Automation"
     And I follow "Automation"
     And ".template-add-form .custom-select#id_templateid" "css_element" should exist
-    Then I should see "WELCOME MESSAGE" in the ".template-add-form .custom-select" "css_element"
+     And "WELCOME MESSAGE" "autocomplete_suggestions" should exist
     # Course 2
     And I am on "Course 2" course homepage
     Then I should see "Automation"
     And I follow "Automation"
     And ".template-add-form .custom-select#id_templateid" "css_element" should exist
-    Then I should see "WELCOME MESSAGE" in the ".template-add-form .custom-select" "css_element"
+    And "WELCOME MESSAGE" "autocomplete_suggestions" should exist
     # Course 3
     And I am on "Course 3" course homepage
     Then I should see "Automation"
@@ -237,22 +238,22 @@ Feature: Pulse automation templates
       | Reference | notification |
     And I am on "Course 1" course homepage
     And I follow "Automation"
-    And I set the field "templateid" to "WELCOME MESSAGE"
+    And I click on "WELCOME MESSAGE" item in the autocomplete list
     Then I click on "Add automation instance" "button"
     And I set the following fields to these values:
       | insreference | Welcomemessageinstance   |
     And I press "Save changes"
-    And I set the field "templateid" to "WELCOME MESSAGE"
+    And I click on "WELCOME MESSAGE" item in the autocomplete list
     Then I click on "Add automation instance" "button"
     And I set the following fields to these values:
       | insreference | Welcomemessageinstance2   |
     And I press "Save changes"
-    And I set the field "templateid" to "WELCOME MESSAGE"
+    And I click on "WELCOME MESSAGE" item in the autocomplete list
     Then I click on "Add automation instance" "button"
     And I set the following fields to these values:
       | insreference | Welcomemessageinstance3   |
     And I press "Save changes"
-    And I set the field "templateid" to "Notification"
+    And I click on "Notification" item in the autocomplete list
     Then I click on "Add automation instance" "button"
     And I set the following fields to these values:
       | insreference | notificationinstance   |
