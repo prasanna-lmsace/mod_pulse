@@ -716,6 +716,7 @@ class notification {
      *
      * @param array $roles Role ids to fetch
      * @param \context $context
+     * @param int $childuserid
      * @return array List of the users.
      */
     protected function get_users_withroles(array $roles, $context, $childuserid=null) {

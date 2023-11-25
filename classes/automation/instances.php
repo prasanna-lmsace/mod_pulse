@@ -313,6 +313,11 @@ class instances extends templates {
         return $url;
     }
 
+    /**
+     * Get the id of the instance report builder.
+     *
+     * @return int
+     */
     public static function get_reportid() {
         global $DB;
 

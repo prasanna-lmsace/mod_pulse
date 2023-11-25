@@ -121,9 +121,7 @@ class notification extends datasource {
      * @return array
      */
     public function get_default_filters(): array {
-        return [
-            'notification:instanceid'
-        ];
+        return [];
     }
 
     /**
@@ -133,9 +131,7 @@ class notification extends datasource {
      */
     public function get_default_conditions(): array {
 
-        return [
-            'notification:instanceid'
-        ];
+        return [];
     }
 
 }
