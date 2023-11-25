@@ -237,20 +237,14 @@ Feature: Pulse automation templates
       | Reference | notification |
     And I am on "Course 1" course homepage
     And I follow "Automation"
-    When I open the autocomplete suggestions list
-    And I click on "WELCOME MESSAGE" item in the autocomplete list
     Then I click on "Add automation instance" "button"
     And I set the following fields to these values:
       | insreference | Welcomemessageinstance   |
     And I press "Save changes"
-    When I open the autocomplete suggestions list
-    And I click on "WELCOME MESSAGE" item in the autocomplete list
     Then I click on "Add automation instance" "button"
     And I set the following fields to these values:
       | insreference | Welcomemessageinstance2   |
     And I press "Save changes"
-    When I open the autocomplete suggestions list
-    And I click on "WELCOME MESSAGE" item in the autocomplete list
     Then I click on "Add automation instance" "button"
     And I set the following fields to these values:
       | insreference | Welcomemessageinstance3   |
