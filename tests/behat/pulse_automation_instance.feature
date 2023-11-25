@@ -119,7 +119,7 @@ Feature: Pulse automation instances
     And "#pulse_automation_template" "css_element" should not exist
 
   @javascript
-  Scenario: Check the multiple automation template instance.
+  Scenario: Check the multiple automation template instance
     Given I log in as "admin"
     Then I create automation template with the following fields to these values:
       | Title     | WELCOME MESSAGE |
@@ -130,15 +130,15 @@ Feature: Pulse automation instances
     And I am on "Course 1" course homepage
     And I follow "Automation"
     When I open the autocomplete suggestions list
-    And "WELCOME MESSAGE" "autocomplete_suggestions" should exist
-    And "Notification" "autocomplete_suggestions" should exist
-    And I click on "WELCOME MESSAGE" item in the autocomplete list
+    Then I should see "WELCOME MESSAGE" in the ".template-add-form .form-autocomplete-selection" "css_element"
+    Then I should see "Notification" in the ".template-add-form .form-autocomplete-suggestions" "css_element"
     Then I click on "Add automation instance" "button"
     Then the field "Title" matches value "WELCOME MESSAGE"
     And I set the following fields to these values:
       | insreference | Welcomemessageinstance   |
     And I press "Save changes"
     And I should see "WELCOME MESSAGE" in the "#pulse_automation_template tbody tr:nth-child(1)" "css_element"
+    When I open the autocomplete suggestions list
     And I click on "Notification" item in the autocomplete list
     Then I click on "Add automation instance" "button"
     Then the field "Title" matches value "Notification"
