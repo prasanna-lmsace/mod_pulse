@@ -34,6 +34,8 @@ Feature: Pulse automation instances
     And I should see "WELCOME MESSAGE" in the "#pulse_automation_template" "css_element"
     And I am on "Course 1" course homepage
     And I follow "Automation"
+    When I open the autocomplete suggestions list
+    And I click on "WELCOME MESSAGE" item in the autocomplete list
     Then I click on "Add automation instance" "button"
     And I set the following fields to these values:
       | override[title] | 1                  |
@@ -54,6 +56,8 @@ Feature: Pulse automation instances
     And I should see "WELCOME MESSAGE" in the "#pulse_automation_template" "css_element"
     And I am on "Course 1" course homepage
     And I follow "Automation"
+    When I open the autocomplete suggestions list
+    And I click on "WELCOME MESSAGE" item in the autocomplete list
     Then I click on "Add automation instance" "button"
     And I set the following fields to these values:
       | insreference | Welcomemessage   |
@@ -83,6 +87,8 @@ Feature: Pulse automation instances
     | Visibility| Show            |
     And I am on "Course 1" course homepage
     And I follow "Automation"
+    When I open the autocomplete suggestions list
+    And I click on "WELCOME MESSAGE" item in the autocomplete list
     Then I click on "Add automation instance" "button"
     And I set the following fields to these values:
       | override[title] | 1                  |
@@ -104,6 +110,8 @@ Feature: Pulse automation instances
       | Visibility| Show            |
     And I am on "Course 1" course homepage
     And I follow "Automation"
+    When I open the autocomplete suggestions list
+    And I click on "WELCOME MESSAGE" item in the autocomplete list
     Then I click on "Add automation instance" "button"
     And I set the following fields to these values:
       | insreference | Welcomemessage   |
@@ -132,6 +140,8 @@ Feature: Pulse automation instances
     When I open the autocomplete suggestions list
     Then I should see "WELCOME MESSAGE" in the ".template-add-form .form-autocomplete-selection" "css_element"
     Then I should see "Notification" in the ".template-add-form .form-autocomplete-suggestions" "css_element"
+    When I open the autocomplete suggestions list
+    And I click on "WELCOME MESSAGE" item in the autocomplete list
     Then I click on "Add automation instance" "button"
     Then the field "Title" matches value "WELCOME MESSAGE"
     And I set the following fields to these values:

@@ -356,3 +356,8 @@ body.behat-site .pulse-instance-status-switch input.custom-control-input {
     position: relative;
     z-index: -1;
 }
+
+/* HIde the required icon and description from the add template instance form */
+.path-mod-pulse-automation-instances .template-add-form #fitem_id_templateid .text-danger {
+    display: none;
+}
