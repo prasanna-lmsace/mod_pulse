@@ -152,7 +152,9 @@ class notify_users extends \core\task\scheduled_task {
             $params[] = time();
             $params[] = 1;
             $params[] = $pulse['id'];
-            $students = $DB->get_records_sql($usersql, $params);
+
+            $limit = get_config('mod_pulse', 'schedulecount') ?: 100;
+            $students = $DB->get_records_sql($usersql, $params, 0, $limit);
 
             $courseid = $pulse['course'];
 

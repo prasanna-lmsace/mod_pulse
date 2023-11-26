@@ -34,7 +34,7 @@ Feature: Activity trigger event.
     And I am on "Course 1" course homepage
     And I follow "Automation"
     When I open the autocomplete suggestions list
-    And I click on "WELCOME MESSAGE" item in the autocomplete list
+    And I click on "WELCOME MESSAGE 01" item in the autocomplete list
     Then I press "Add automation instance"
     And I set the following fields to these values:
       | insreference | Welcomemessage   |

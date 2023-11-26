@@ -98,6 +98,7 @@ Feature: Pulse automation templates
     And I am on "Course 1" course homepage
     And I follow "Automation"
     And ".template-add-form .custom-select#id_templateid" "css_element" should exist
+    When I open the autocomplete suggestions list
     Then I should see "WELCOME MESSAGE" in the ".template-add-form" "css_element"
 
   @javascript
@@ -123,13 +124,13 @@ Feature: Pulse automation templates
     And I am on "Course 1" course homepage
     And I follow "Automation"
     And ".template-add-form .custom-select#id_templateid" "css_element" should not exist
-    When I open the autocomplete suggestions list
     Then I should not see "WELCOME MESSAGE" in the ".template-add-form" "css_element"
     And I navigate to "Plugins > Activity modules > Pulse > Automation templates" in site administration
     Then I click on ".action-show" "css_element" in the "WELCOME MESSAGE" "table_row"
     And I am on "Course 1" course homepage
     And I follow "Automation"
     And ".template-add-form .custom-select#id_templateid" "css_element" should exist
+    When I open the autocomplete suggestions list
     Then I should see "WELCOME MESSAGE" in the ".template-add-form" "css_element"
 
   @javascript
@@ -150,7 +151,6 @@ Feature: Pulse automation templates
     Then I should see "Automation"
     And I follow "Automation"
     And ".template-add-form .custom-select#id_templateid" "css_element" should not exist
-    When I open the autocomplete suggestions list
     Then I should not see "WELCOME MESSAGE" in the ".template-add-form" "css_element"
     # Course 3
     And I am on "Course 2" course homepage
@@ -195,6 +195,8 @@ Feature: Pulse automation templates
         | Trigger operator | All                 |
     And I am on "Course 1" course homepage
     And I follow "Automation"
+    When I open the autocomplete suggestions list
+    And I click on "WELCOME MESSAGE" item in the autocomplete list
     Then I press "Add automation instance"
     Then I follow "Condition"
     Then I should see "Activity completion"
