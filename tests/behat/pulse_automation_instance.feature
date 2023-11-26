@@ -156,7 +156,8 @@ Feature: Pulse automation instances
       | insreference | notificationinstance   |
     And I press "Save changes"
     And I should see "Notification" in the "#pulse_automation_template tbody tr:nth-child(2)" "css_element"
-    And I set the field "templateid" to "WELCOME MESSAGE"
+    When I open the autocomplete suggestions list
+    And I click on "WELCOME MESSAGE" item in the autocomplete list
     Then I click on "Add automation instance" "button"
     Then the field "Title" matches value "WELCOME MESSAGE"
     And I set the following fields to these values:

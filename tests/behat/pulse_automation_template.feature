@@ -83,6 +83,7 @@ Feature: Pulse automation templates
     And I follow "Automation"
     Then I should see "Automation" in the "#region-main h2" "css_element"
     And ".template-add-form .custom-select#id_templateid" "css_element" should exist
+    When I open the autocomplete suggestions list
     Then I should see "WELCOME MESSAGE" in the ".template-add-form .form-autocomplete-suggestions" "css_element"
     And I navigate to "Plugins > Activity modules > Pulse > Automation templates" in site administration
     Then I click on ".action-edit" "css_element" in the "WELCOME MESSAGE" "table_row"
@@ -113,6 +114,7 @@ Feature: Pulse automation templates
     And I follow "Automation"
     Then I should see "Automation" in the "#region-main h2" "css_element"
     And ".template-add-form .custom-select#id_templateid" "css_element" should exist
+    When I open the autocomplete suggestions list
     Then I should see "WELCOME MESSAGE" in the ".template-add-form .form-autocomplete-suggestions" "css_element"
     And I navigate to "Plugins > Activity modules > Pulse > Automation templates" in site administration
     Then I click on ".action-edit" "css_element" in the "WELCOME MESSAGE" "table_row"
@@ -121,6 +123,7 @@ Feature: Pulse automation templates
     And I am on "Course 1" course homepage
     And I follow "Automation"
     And ".template-add-form .custom-select#id_templateid" "css_element" should not exist
+    When I open the autocomplete suggestions list
     Then I should not see "WELCOME MESSAGE" in the ".template-add-form" "css_element"
     And I navigate to "Plugins > Activity modules > Pulse > Automation templates" in site administration
     Then I click on ".action-show" "css_element" in the "WELCOME MESSAGE" "table_row"
@@ -140,12 +143,14 @@ Feature: Pulse automation templates
     Then I should see "Automation"
     And I follow "Automation"
     And ".template-add-form .custom-select#id_templateid" "css_element" should exist
+    When I open the autocomplete suggestions list
     Then I should see "WELCOME MESSAGE" in the ".template-add-form .form-autocomplete-suggestions" "css_element"
     # Course 2
     And I am on "Course 2" course homepage
     Then I should see "Automation"
     And I follow "Automation"
     And ".template-add-form .custom-select#id_templateid" "css_element" should not exist
+    When I open the autocomplete suggestions list
     Then I should not see "WELCOME MESSAGE" in the ".template-add-form" "css_element"
     # Course 3
     And I am on "Course 2" course homepage
@@ -162,12 +167,14 @@ Feature: Pulse automation templates
     Then I should see "Automation"
     And I follow "Automation"
     And ".template-add-form .custom-select#id_templateid" "css_element" should exist
+    When I open the autocomplete suggestions list
     Then I should see "WELCOME MESSAGE" in the ".template-add-form .form-autocomplete-suggestions" "css_element"
     # Course 2
     And I am on "Course 2" course homepage
     Then I should see "Automation"
     And I follow "Automation"
     And ".template-add-form .custom-select#id_templateid" "css_element" should exist
+    When I open the autocomplete suggestions list
     Then I should see "WELCOME MESSAGE" in the ".template-add-form .form-autocomplete-suggestions" "css_element"
     # Course 3
     And I am on "Course 3" course homepage
