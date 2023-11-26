@@ -164,7 +164,10 @@ class notify_users extends \core\task\scheduled_task {
             $instance->context = (object) $context;
             $instance->cm = (object) $cm;
             $instance->students = $students;
-            self::pulse_set_notification_adhoc($instance);
+            // Students are available.
+            if (!empty($students)) {
+                self::pulse_set_notification_adhoc($instance);
+            }
         }
         pulse_mtrace('Pulse message sending completed....');
         return true;

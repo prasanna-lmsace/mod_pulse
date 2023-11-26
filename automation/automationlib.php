@@ -50,7 +50,6 @@ class template_addinstance_form extends \moodleform {
         $templates = [0 => ''] + mod_pulse\automation\helper::get_templates_forinstance($courseid);
         if (!empty($templates)) {
             $mform->addElement('autocomplete', 'templateid', '', $templates);
-            // $mform->addRule('templateid', get_string('required'), 'required', '', 'client');
         }
 
         $this->add_action_buttons(true, get_string('addtemplatebtn', 'pulse'));
