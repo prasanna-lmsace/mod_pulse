@@ -20,7 +20,7 @@ Feature: Activity trigger event.
       | student1 | C1     | student |
 
   @javascript
-  Scenario: Check the pluse condition activity trigger workflow.
+  Scenario: Check the pluse condition activity trigger workflow
     Given I log in as "admin"
     Then I create automation template with the following fields to these values:
       | Title     | WELCOME MESSAGE 01 |
